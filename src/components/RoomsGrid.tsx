@@ -1,177 +1,185 @@
 'use client';
 
-import RoomCard from './RoomCard';
-import type { Room } from '@/types';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { roomOptions } from '@/data/rooms';
 
-const rooms: Room[] = [
+interface PropertyCard {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  percentage: string;
+  caption: string;
+  roomSlug: string;
+}
+
+const properties: PropertyCard[] = [
   {
-    id: 'garden-suite',
-    name: 'Garden Suite',
-    description: 'Immerse yourself in tropical serenity with floor-to-ceiling windows overlooking our lush botanical garden. A sanctuary of calm and luxury.',
-    image: '/images/room-suite.png',
-    stat: '98%',
-    statLabel: 'Guest Satisfaction Rating',
-    price: 'From $320/night',
-    size: '65 m²',
-    capacity: 2,
-  },
-  {
-    id: 'sunset-villa',
-    name: 'Sunset Pool Villa',
-    description: 'Your private tropical paradise. A standalone villa with a plunge pool, open-air living, and breathtaking ocean views bathed in eternal golden light.',
+    id: 'room-01',
+    title: 'Lagoon Villa Retreat',
+    description: 'A lush waterfront escape with soft natural light and calm, sustainable luxury.',
     image: '/images/room-villa.png',
-    stat: '210%',
-    statLabel: 'Return Guest Rate',
-    price: 'From $780/night',
-    size: '180 m²',
-    capacity: 4,
+    percentage: '60%',
+    caption: 'Sustainability',
+    roomSlug: 'lagoon-villa',
   },
   {
-    id: 'ocean-bungalow',
-    name: 'Ocean Bungalow',
-    description: 'Step off your deck directly into warm turquoise waters. This beachfront bungalow offers unrivalled access to nature with world-class amenities.',
+    id: 'room-02',
+    title: 'Ocean Edge Pavilion',
+    description: 'A modern seaside home with inviting decks, striking views, and thoughtful eco design.',
     image: '/images/pool.png',
-    stat: '310%',
-    statLabel: 'Booking Demand vs. Avg.',
-    price: 'From $520/night',
-    size: '95 m²',
-    capacity: 2,
+    percentage: '210%',
+    caption: 'Sustainability',
+    roomSlug: 'ocean-pavilion',
   },
   {
-    id: 'royal-penthouse',
-    name: 'Royal Penthouse',
-    description: 'The pinnacle of luxury at NAGAS. A rooftop sanctuary with a private pool, dedicated butler service, and a 360° panoramic view of the resort and ocean.',
+    id: 'room-03',
+    title: 'Garden House Escape',
+    description: 'Serene botanical living with warm textures, generous light, and lush private gardens.',
+    image: '/images/garden.png',
+    percentage: '310%',
+    caption: 'Sustainability',
+    roomSlug: 'garden-suite',
+  },
+  {
+    id: 'property-04',
+    title: 'Royal Residence Suite',
+    description: 'A refined residence that pairs open-air dining with elegant sustainable finishes.',
     image: '/images/dining.png',
-    stat: '510%',
-    statLabel: 'Premium Experience Score',
-    price: 'From $1,200/night',
-    size: '320 m²',
-    capacity: 6,
+    percentage: '510%',
+    caption: 'Sustainability',
+    roomSlug: 'royal-suite',
+  },
+  {
+    id: 'room-05',
+    title: 'Sunset Terrace House',
+    description: 'A bright coastal haven framed by golden sunsets and premium, natural materials.',
+    image: '/images/hero.png',
+    percentage: '170%',
+    caption: 'Sustainability',
+    roomSlug: 'lagoon-villa',
+  },
+  {
+    id: 'room-06',
+    title: 'Poolside Luxe Residence',
+    description: 'A seamless indoor-outdoor sanctuary built around light, water, and calm evenings.',
+    image: '/images/room-suite.png',
+    percentage: '420%',
+    caption: 'Sustainability',
+    roomSlug: 'ocean-pavilion',
   },
 ];
 
+function RoomCard({ property, onSelect }: { property: PropertyCard; onSelect: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className="group flex flex-col overflow-hidden rounded-[2rem] border border-sunset-gold/20 bg-sunset-cream/80 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
+    >
+      <div className="relative h-80 overflow-hidden transition-all duration-500">
+        <Image
+          src={property.image}
+          alt={property.title}
+          fill
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-sunset-dark/50 via-transparent to-transparent" />
+        <div className="absolute left-4 bottom-4 rounded-full bg-white/90 px-4 py-2 text-[0.75rem] font-semibold uppercase tracking-[0.18em] text-sunset-dark shadow-sm">
+          {property.percentage}
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col p-6 gap-5">
+        <div>
+          <span className="inline-flex rounded-full border border-sunset-dark/15 px-3 py-1.5 text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-sunset-dark">
+            Luxury stay
+          </span>
+          <h3 className="mt-4 font-serif text-2xl font-bold text-sunset-dark leading-tight">
+            {property.title}
+          </h3>
+          <p className="mt-4 text-sm leading-relaxed text-sunset-purple/70">
+            {property.description}
+          </p>
+        </div>
+
+        <div className="mt-auto flex flex-col gap-4">
+          <div className="rounded-[1.4rem] border border-sunset-gold/20 bg-white/70 px-4 py-3 text-sm text-sunset-dark">
+            <p className="font-semibold">{property.caption}</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-sunset-purple/60">Sustainable comfort</p>
+          </div>
+
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onSelect();
+            }}
+            className="inline-flex w-full justify-center rounded-full bg-sunset-dark px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-sunset-orange"
+          >
+            Reserve now
+          </button>
+        </div>
+      </div>
+    </button>
+  );
+}
+
 export default function RoomsGrid() {
+  const router = useRouter();
+
+  const handleSelectRoom = (property: PropertyCard) => {
+    router.push(`/reserve/${property.roomSlug}`);
+  };
+
   return (
     <section id="rooms" className="section-padding bg-sunset-cream relative overflow-hidden">
-      {/* Decorative gradient blob */}
       <div
-        className="absolute top-1/2 right-0 w-80 h-80 -translate-y-1/2 translate-x-1/3 opacity-10 pointer-events-none"
-        style={{ background: 'radial-gradient(circle, #C1447E, transparent)', borderRadius: '60% 40% 50% 50%' }}
+        className="pointer-events-none absolute inset-x-0 top-24 h-72 opacity-10 blur-3xl"
+        style={{ background: 'radial-gradient(circle, rgba(196,154,60,0.35), transparent 55%)' }}
       />
 
-      <div className="max-w-7xl mx-auto">
-        {/* Section Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
-          <div className="reveal">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="sunset-divider" />
-              <span className="text-sunset-orange text-sm font-semibold tracking-widest uppercase">Accommodations</span>
-            </div>
+      <div className="max-w-7xl mx-auto relative">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between mb-10">
+          <div className="max-w-2xl">
+            <p className="text-sm uppercase tracking-[0.32em] text-sunset-orange font-semibold mb-3">Our Properties</p>
             <h2 className="font-serif text-4xl md:text-5xl font-bold text-sunset-dark leading-tight">
-              Our Rooms &{' '}
-              <span className="sunset-gradient-text">Villas</span>
+              Explore rooms first, then book the one that feels right.
             </h2>
           </div>
 
-          <div className="flex flex-col md:items-end gap-4 reveal">
-            <p className="text-sunset-purple/65 max-w-sm text-sm leading-relaxed">
-              Each space is thoughtfully designed to blend natural beauty with curated luxury — where every detail tells a story.
-            </p>
-            <button className="btn-pill btn-outline self-start md:self-auto text-sm py-2.5 px-5">
-              View All Rooms →
-            </button>
-          </div>
+          <p className="max-w-md text-sm leading-relaxed text-sunset-purple/70">
+            Choose a room card to preview its details, then move into the booking form below for your preferred dates.
+          </p>
         </div>
 
-        {/* Asymmetric Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+          {properties.map((property) => (
+            <RoomCard key={property.id} property={property} onSelect={() => handleSelectRoom(property)} />
+          ))}
+        </div>
 
-          {/* Card 1 — Large (spans 7 cols) */}
-          <div className="lg:col-span-7 reveal">
-            <div className="resort-card overflow-hidden group flex flex-col md:flex-row h-full">
-              {/* Image */}
-              <div className="relative overflow-hidden md:w-1/2 h-56 md:h-auto">
-                <img
-                  src={rooms[0].image}
-                  alt={rooms[0].name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute top-4 right-4 bg-white/95 rounded-full px-3 py-1.5 shadow-card">
-                  <span className="text-sunset-orange font-bold text-sm">{rooms[0].price}</span>
-                </div>
-              </div>
-              {/* Content */}
-              <div className="p-6 flex flex-col justify-between md:w-1/2">
-                <div>
-                  <h3 className="font-serif text-2xl font-bold text-sunset-dark mb-2 group-hover:text-sunset-orange transition-colors">
-                    {rooms[0].name}
-                  </h3>
-                  <p className="text-sunset-purple/65 text-sm leading-relaxed mb-4">{rooms[0].description}</p>
-                </div>
-                <div>
-                  <div className="stat-badge mb-4">
-                    <span className="font-serif text-3xl font-bold sunset-gradient-text">{rooms[0].stat}</span>
-                    <p className="text-xs text-sunset-purple/70 font-semibold mt-0.5">{rooms[0].statLabel}</p>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-3 text-xs text-sunset-purple/50">
-                      <span>📐 {rooms[0].size}</span>
-                      <span>👥 {rooms[0].capacity} guests</span>
-                    </div>
-                    <button className="btn-pill btn-sunset text-xs py-2 px-4">Book</button>
-                  </div>
-                </div>
-              </div>
+        <div className="mt-12 rounded-[2rem] border border-sunset-gold/20 bg-white/85 p-6 shadow-card backdrop-blur md:p-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-sm uppercase tracking-[0.3em] text-sunset-orange font-semibold mb-2">Reserve your stay</p>
+              <h3 className="font-serif text-3xl md:text-4xl font-bold text-sunset-dark leading-tight">
+                Choose a room and continue to a dedicated reservation page.
+              </h3>
+              <p className="mt-3 text-sm leading-relaxed text-sunset-purple/70">
+                Each room card now opens a full booking experience where you can review the room and submit your request.
+              </p>
             </div>
-          </div>
 
-          {/* Card 2 — Small (spans 5 cols) */}
-          <div className="lg:col-span-5 reveal animation-delay-100">
-            <RoomCard room={rooms[1]} variant="large" />
-          </div>
-
-          {/* Card 3 — Small (spans 5 cols) */}
-          <div className="lg:col-span-5 reveal animation-delay-200">
-            <RoomCard room={rooms[2]} variant="small" />
-          </div>
-
-          {/* Card 4 — Large (spans 7 cols) */}
-          <div className="lg:col-span-7 reveal animation-delay-300">
-            <div className="resort-card overflow-hidden group flex flex-col md:flex-row-reverse h-full">
-              {/* Image */}
-              <div className="relative overflow-hidden md:w-1/2 h-56 md:h-auto">
-                <img
-                  src={rooms[3].image}
-                  alt={rooms[3].name}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute top-4 left-4 bg-white/95 rounded-full px-3 py-1.5 shadow-card">
-                  <span className="text-sunset-orange font-bold text-sm">{rooms[3].price}</span>
-                </div>
-              </div>
-              {/* Content */}
-              <div className="p-6 flex flex-col justify-between md:w-1/2">
-                <div>
-                  <h3 className="font-serif text-2xl font-bold text-sunset-dark mb-2 group-hover:text-sunset-orange transition-colors">
-                    {rooms[3].name}
-                  </h3>
-                  <p className="text-sunset-purple/65 text-sm leading-relaxed mb-4">{rooms[3].description}</p>
-                </div>
-                <div>
-                  <div className="stat-badge mb-4">
-                    <span className="font-serif text-3xl font-bold sunset-gradient-text">{rooms[3].stat}</span>
-                    <p className="text-xs text-sunset-purple/70 font-semibold mt-0.5">{rooms[3].statLabel}</p>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-3 text-xs text-sunset-purple/50">
-                      <span>📐 {rooms[3].size}</span>
-                      <span>👥 {rooms[3].capacity} guests</span>
-                    </div>
-                    <button className="btn-pill btn-sunset text-xs py-2 px-4">Book</button>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <button
+              type="button"
+              onClick={() => router.push(`/reserve/${roomOptions[0].value}`)}
+              className="btn-pill btn-sunset h-fit self-start text-sm"
+            >
+              Start reservation
+            </button>
           </div>
         </div>
       </div>

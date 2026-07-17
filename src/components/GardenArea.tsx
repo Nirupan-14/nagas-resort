@@ -59,11 +59,14 @@ export default function GardenArea() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
           {/* Images collage */}
           <div className="relative reveal-left">
-            {/* Primary large image */}
+            {/* Offset frame behind primary image, signals depth without an organic blob */}
             <div
-              className="relative h-80 md:h-[480px] overflow-hidden shadow-sunset-lg"
-              style={{ borderRadius: '45% 55% 50% 50% / 50% 45% 55% 50%' }}
-            >
+              className="absolute -top-4 -left-4 w-full h-80 md:h-[480px] border-2 border-sunset-gold/25 rounded-[28px] pointer-events-none hidden sm:block"
+              aria-hidden="true"
+            />
+
+            {/* Primary large image */}
+            <div className="relative h-80 md:h-[480px] overflow-hidden shadow-sunset-lg rounded-tl-[28px] rounded-tr-[28px] rounded-bl-[28px] rounded-br-[96px]">
               <Image
                 src="/images/garden.png"
                 alt="NAGAS Resort tropical garden pathway"
@@ -78,10 +81,7 @@ export default function GardenArea() {
             </div>
 
             {/* Overlapping secondary image */}
-            <div
-              className="absolute -bottom-8 -right-4 md:-right-8 w-40 md:w-56 h-32 md:h-44 overflow-hidden shadow-card-hover border-4 border-white"
-              style={{ borderRadius: '40% 60% 55% 45% / 50% 40% 60% 50%' }}
-            >
+            <div className="absolute -bottom-8 -right-4 md:-right-8 w-40 md:w-56 h-32 md:h-44 overflow-hidden shadow-card-hover border-4 border-white rounded-[20px]">
               <Image
                 src="/images/pool.png"
                 alt="Garden pool"
@@ -125,10 +125,7 @@ export default function GardenArea() {
         </div>
 
         {/* Full-width panoramic banner */}
-        <div
-          className="relative h-64 md:h-80 overflow-hidden shadow-sunset reveal"
-          style={{ borderRadius: '1.5rem' }}
-        >
+        <div className="relative h-64 md:h-80 overflow-hidden shadow-sunset reveal rounded-3xl">
           <Image
             src="/images/garden.png"
             alt="NAGAS Resort garden panorama"

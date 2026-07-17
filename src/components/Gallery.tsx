@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import Image from 'next/image';
 import type { GalleryImage } from '@/types';
 
@@ -20,13 +20,33 @@ const categories = ['All', 'Resort', 'Rooms', 'Garden', 'Pool', 'Dining'];
 
 export default function Gallery() {
   const [activeCategory, setActiveCategory] = useState('All');
-  const [lightbox, setLightbox] = useState<GalleryImage | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
-  const filtered = activeCategory === 'All'
-    ? galleryImages
-    : galleryImages.filter(img => img.category.toLowerCase() === activeCategory.toLowerCase());
+  const filtered = useMemo(
+    () =>
+      activeCategory === 'All'
+        ? galleryImages
+        : galleryImages.filter((img) => img.category.toLowerCase() === activeCategory.toLowerCase()),
+    [activeCategory]
+  );
 
-  const closeLightbox = useCallback(() => setLightbox(null), []);
+  const closeLightbox = useCallback(() => setLightboxIndex(null), []);
+  const showPrev = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setLightboxIndex((i) => (i === null ? i : (i - 1 + filtered.length) % filtered.length));
+    },
+    [filtered.length]
+  );
+  const showNext = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setLightboxIndex((i) => (i === null ? i : (i + 1) % filtered.length));
+    },
+    [filtered.length]
+  );
+
+  const lightboxImage = lightboxIndex !== null ? filtered[lightboxIndex] : null;
 
   return (
     <section id="gallery" className="section-padding bg-white relative overflow-hidden">
@@ -51,7 +71,10 @@ export default function Gallery() {
           {categories.map((cat) => (
             <button
               key={cat}
-              onClick={() => setActiveCategory(cat)}
+              onClick={() => {
+                setActiveCategory(cat);
+                setLightboxIndex(null);
+              }}
               className={`btn-pill text-sm py-2 px-5 transition-all duration-300 ${
                 activeCategory === cat
                   ? 'btn-sunset'
@@ -63,42 +86,52 @@ export default function Gallery() {
           ))}
         </div>
 
-        {/* Masonry/Grid */}
-        <div className="columns-1 sm:columns-2 lg:columns-3 gap-4 space-y-4 reveal">
-          {filtered.map((img) => (
-            <div
-              key={img.id}
-              className={`relative overflow-hidden rounded-2xl cursor-pointer group break-inside-avoid shadow-card hover:shadow-card-hover transition-all duration-400 ${
-                img.span === 'wide' ? 'sm:aspect-video' : img.span === 'tall' ? 'aspect-[3/4]' : 'aspect-square'
-              }`}
-              onClick={() => setLightbox(img)}
-            >
-              <div className="relative w-full h-56 sm:h-auto" style={{ minHeight: img.span === 'tall' ? '320px' : '220px' }}>
+        {/* Editorial grid — deliberate, fixed placement rather than auto-flowing masonry */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 auto-rows-[180px] sm:auto-rows-[220px] gap-4 reveal">
+          {filtered.map((img, i) => {
+            const isSignature = i === 0 && img.span === 'wide';
+            const spanClasses =
+              img.span === 'wide'
+                ? 'col-span-2 row-span-1'
+                : img.span === 'tall'
+                ? 'col-span-1 row-span-2'
+                : 'col-span-1 row-span-1';
+
+            return (
+              <button
+                key={img.id}
+                type="button"
+                className={`relative overflow-hidden cursor-pointer group text-left shadow-card hover:shadow-card-hover transition-all duration-400 ${spanClasses} ${
+                  isSignature ? 'rounded-tl-2xl rounded-tr-2xl rounded-bl-2xl rounded-br-[56px]' : 'rounded-2xl'
+                }`}
+                onClick={() => setLightboxIndex(i)}
+                aria-label={`Open ${img.alt} in lightbox`}
+              >
                 <Image
                   src={img.src}
                   alt={img.alt}
                   fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-110"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 25vw"
                 />
-              </div>
-              {/* Hover overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-sunset-purple/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-400 flex items-end p-4">
-                <div className="translate-y-4 group-hover:translate-y-0 transition-transform duration-400">
-                  <p className="text-white font-medium text-sm">{img.alt}</p>
-                  <p className="text-white/70 text-xs capitalize">{img.category}</p>
+                {/* Hover overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-sunset-purple/70 via-sunset-purple/0 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-400 flex items-end p-4">
+                  <div className="translate-y-3 group-hover:translate-y-0 transition-transform duration-400">
+                    <p className="text-white font-medium text-sm leading-tight">{img.alt}</p>
+                    <p className="text-white/70 text-xs uppercase tracking-wide mt-0.5">{img.category}</p>
+                  </div>
                 </div>
-                <div className="absolute top-4 right-4 w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                  <span className="text-white text-sm">⛶</span>
+                <div className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/15 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="text-white text-sm leading-none">⛶</span>
                 </div>
-              </div>
-            </div>
-          ))}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Lightbox */}
-      {lightbox && (
+      {lightboxImage && (
         <div
           className="lightbox-overlay"
           onClick={closeLightbox}
@@ -114,20 +147,40 @@ export default function Gallery() {
             ✕
           </button>
 
+          <button
+            onClick={showPrev}
+            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white text-lg transition-all"
+            aria-label="Previous image"
+          >
+            ‹
+          </button>
+          <button
+            onClick={showNext}
+            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white text-lg transition-all"
+            aria-label="Next image"
+          >
+            ›
+          </button>
+
           <div
-            className="relative w-full max-w-4xl max-h-[85vh] mx-4 rounded-3xl overflow-hidden shadow-sunset-lg"
+            className="relative w-full max-w-4xl max-h-[85vh] mx-4 rounded-tl-2xl rounded-tr-2xl rounded-bl-2xl rounded-br-[64px] overflow-hidden shadow-sunset-lg"
             onClick={(e) => e.stopPropagation()}
           >
             <Image
-              src={lightbox.src}
-              alt={lightbox.alt}
+              src={lightboxImage.src}
+              alt={lightboxImage.alt}
               width={1200}
               height={800}
-              className="w-full h-auto max-h-[85vh] object-contain"
+              className="w-full h-auto max-h-[85vh] object-contain bg-sunset-dark"
             />
-            <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-sunset-dark/80 to-transparent">
-              <p className="text-white font-medium">{lightbox.alt}</p>
-              <p className="text-white/60 text-sm capitalize">{lightbox.category}</p>
+            <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-sunset-dark/80 to-transparent flex items-end justify-between gap-4">
+              <div>
+                <p className="text-white font-medium">{lightboxImage.alt}</p>
+                <p className="text-white/60 text-sm capitalize">{lightboxImage.category}</p>
+              </div>
+              <p className="text-white/50 text-xs font-medium tabular-nums shrink-0">
+                {(lightboxIndex ?? 0) + 1} / {filtered.length}
+              </p>
             </div>
           </div>
         </div>

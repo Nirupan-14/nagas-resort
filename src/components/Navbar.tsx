@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { NavItem } from '@/types';
 
 const navItems: NavItem[] = [
@@ -36,16 +37,25 @@ export default function Navbar() {
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
+
+  const router = useRouter();
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     const id = href.replace('#', '');
     const el = document.getElementById(id);
+
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      router.push(`/#${id}`);
     }
+
     setMobileOpen(false);
   };
 
@@ -96,7 +106,7 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Year Badge + CTA */}
+          {/* CTA */}
           <div className="hidden lg:flex items-center gap-3">
             <span
               className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all ${
@@ -136,7 +146,7 @@ export default function Navbar() {
         className={`lg:hidden transition-all duration-400 overflow-hidden ${
           mobileOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
         }`}
-        style={{ background: 'rgba(255, 248, 240, 0.97)', backdropFilter: 'blur(20px)' }}
+        style={{ background: 'rgba(253, 248, 238, 0.97)', backdropFilter: 'blur(20px)' }}
       >
         <div className="px-6 py-6 flex flex-col gap-2 border-t border-sunset-orange/10">
           {navItems.map((item) => (
