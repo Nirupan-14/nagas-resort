@@ -133,15 +133,29 @@ export default function Gallery() {
       {/* Lightbox */}
       {lightboxImage && (
         <div
-          className="lightbox-overlay"
+          className="lightbox-overlay fixed inset-0 z-50 bg-sunset-dark"
           onClick={closeLightbox}
           role="dialog"
           aria-modal="true"
           aria-label="Image lightbox"
         >
+          <div
+            className="absolute inset-0"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={lightboxImage.src}
+              alt={lightboxImage.alt}
+              fill
+              className="w-full h-full object-cover"
+              sizes="100vw"
+              priority
+            />
+          </div>
+
           <button
             onClick={closeLightbox}
-            className="absolute top-6 right-6 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white text-xl transition-all"
+            className="absolute top-6 right-6 z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white text-xl transition-all"
             aria-label="Close lightbox"
           >
             ✕
@@ -149,39 +163,27 @@ export default function Gallery() {
 
           <button
             onClick={showPrev}
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white text-lg transition-all"
+            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-10 w-11 h-11 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white text-lg transition-all"
             aria-label="Previous image"
           >
             ‹
           </button>
           <button
             onClick={showNext}
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 w-11 h-11 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white text-lg transition-all"
+            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-10 w-11 h-11 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white text-lg transition-all"
             aria-label="Next image"
           >
             ›
           </button>
 
-          <div
-            className="relative w-full max-w-4xl max-h-[85vh] mx-4 rounded-tl-2xl rounded-tr-2xl rounded-bl-2xl rounded-br-[64px] overflow-hidden shadow-sunset-lg"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Image
-              src={lightboxImage.src}
-              alt={lightboxImage.alt}
-              width={1200}
-              height={800}
-              className="w-full h-auto max-h-[85vh] object-contain bg-sunset-dark"
-            />
-            <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-sunset-dark/80 to-transparent flex items-end justify-between gap-4">
-              <div>
-                <p className="text-white font-medium">{lightboxImage.alt}</p>
-                <p className="text-white/60 text-sm capitalize">{lightboxImage.category}</p>
-              </div>
-              <p className="text-white/50 text-xs font-medium tabular-nums shrink-0">
-                {(lightboxIndex ?? 0) + 1} / {filtered.length}
-              </p>
+          <div className="absolute bottom-0 left-0 right-0 z-10 p-6 bg-gradient-to-t from-sunset-dark/80 to-transparent flex items-end justify-between gap-4">
+            <div>
+              <p className="text-white font-medium">{lightboxImage.alt}</p>
+              <p className="text-white/60 text-sm capitalize">{lightboxImage.category}</p>
             </div>
+            <p className="text-white/50 text-xs font-medium tabular-nums shrink-0">
+              {(lightboxIndex ?? 0) + 1} / {filtered.length}
+            </p>
           </div>
         </div>
       )}

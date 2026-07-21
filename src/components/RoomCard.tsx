@@ -13,7 +13,7 @@ export default function RoomCard({ room, variant = 'small' }: RoomCardProps) {
 
   return (
     <div
-      className={`resort-card overflow-hidden group ${isLarge ? 'flex flex-col' : 'flex flex-col'}`}
+      className={ `resort-card overflow-hidden group ${isLarge ? 'flex flex-col' : 'flex flex-col'}`}
     >
       {/* Image */}
       <div className={`relative overflow-hidden ${isLarge ? 'h-64' : 'h-48'}`}>

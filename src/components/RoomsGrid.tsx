@@ -73,10 +73,17 @@ const properties: PropertyCard[] = [
 
 function RoomCard({ property, onSelect }: { property: PropertyCard; onSelect: () => void }) {
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onSelect}
-      className="group flex flex-col overflow-hidden rounded-[2rem] border border-sunset-gold/20 bg-sunset-cream/80 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
+      className="group flex flex-col overflow-hidden rounded-[2rem] border border-sunset-gold/20 bg-sunset-cream/80 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover cursor-pointer"
     >
       <div className="relative h-80 overflow-hidden transition-all duration-500">
         <Image
@@ -123,7 +130,7 @@ function RoomCard({ property, onSelect }: { property: PropertyCard; onSelect: ()
           </button>
         </div>
       </div>
-    </button>
+    </div>
   );
 }
 

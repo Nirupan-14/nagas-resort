@@ -1,137 +1,294 @@
 'use client';
 
-import { useState } from 'react';
+import { type ChangeEvent, type FormEvent, useEffect, useState } from 'react';
 import ReviewCard from './ReviewCard';
 import type { ReviewProps } from '@/types';
 
-const reviews: ReviewProps[] = [
-  {
-    name: 'Amelia Richardson',
-    role: 'Travel Blogger, London',
-    quote: 'NAGAS Resort redefined what luxury means to me. Every sunrise from our villa deck was a masterpiece, and the staff made us feel like royalty from the first moment to the last. An experience I will carry forever.',
-    image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80',
-    rating: 5,
-  },
-  {
-    name: 'James & Sofia Chen',
-    role: 'Honeymooners, Singapore',
-    quote: 'We celebrated our honeymoon here and it was beyond anything we imagined. The private pool villa, the candlelit garden dinner, the spa — every element was crafted with love. NAGAS has our hearts forever.',
-    image: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&q=80',
-    rating: 5,
-  },
-  {
-    name: 'Dr. Priya Nair',
-    role: 'Medical Professional, Mumbai',
-    quote: 'After years of hectic work, I needed genuine rest. NAGAS delivered exactly that. The garden meditation paths, the wellness treatments, and the incredibly peaceful atmosphere healed me in ways I didn\'t expect.',
-    image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=200&q=80',
-    rating: 5,
-  },
-  {
-    name: 'Marcus Thompson',
-    role: 'Photographer & Adventurer, NYC',
-    quote: 'As a travel photographer, I have visited over 80 resorts worldwide. NAGAS stands alone. The golden light at dusk, the lush gardens, the architecture — it is a photographer\'s paradise wrapped in unmatched hospitality.',
-    image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200&q=80',
-    rating: 5,
-  },
-  {
-    name: 'Isabella Moreau',
-    role: 'Fashion Designer, Paris',
-    quote: 'The aesthetic of NAGAS is impeccable — it feels like a living work of art. The interplay of warm sunset tones, organic textures, and tropical florals created a visual and sensory experience unlike any other.',
-    image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=200&q=80',
-    rating: 5,
-  },
+const defaultReviews: ReviewProps[] = [
+  
+ 
   {
     name: 'Kenji Watanabe',
     role: 'Executive, Tokyo',
-    quote: 'NAGAS offered me something rare — true disconnection. No distractions, just nature, exceptional cuisine, and a team that anticipated every need with quiet elegance. This is where I come to remember what truly matters.',
+    quote:
+      'NAGAS offered me something rare — true disconnection. No distractions, just nature, exceptional cuisine, and a team that anticipated every need with quiet elegance. This is where I come to remember what truly matters.',
     image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=200&q=80',
     rating: 5,
+    gender: 'male',
   },
 ];
 
+const emptyForm = {
+  name: '',
+  role: '',
+  quote: '',
+  rating: 5,
+  gender: 'other' as ReviewProps['gender'],
+  image: '',
+};
+
 export default function ReviewsSection() {
-  const [currentPage, setCurrentPage] = useState(0);
-  const reviewsPerPage = 3;
-  const totalPages = Math.ceil(reviews.length / reviewsPerPage);
-  const visibleReviews = reviews.slice(currentPage * reviewsPerPage, (currentPage + 1) * reviewsPerPage);
+  const [reviews, setReviews] = useState<ReviewProps[]>(defaultReviews);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [formData, setFormData] = useState(emptyForm);
+  const [selectedFileName, setSelectedFileName] = useState('');
+  const [showModal, setShowModal] = useState(false);
+
+  const total = reviews.length;
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadReviews = async () => {
+      try {
+        const response = await fetch('/api/reviews');
+        const data = await response.json();
+        if (!isMounted) return;
+        setReviews(Array.isArray(data) && data.length > 0 ? data : defaultReviews);
+        setCurrentIndex(0);
+      } catch {
+        if (!isMounted) return;
+        setReviews(defaultReviews);
+      }
+    };
+
+    void loadReviews();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      setSelectedFileName('');
+      setFormData((previous) => ({ ...previous, image: '' }));
+      return;
+    }
+
+    setSelectedFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      setFormData((previous) => ({ ...previous, image: result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError('');
+
+    if (!formData.name.trim() || !formData.role.trim() || !formData.quote.trim()) {
+      setError('Please add your name, role, and review before sharing it.');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      const response = await fetch('/api/reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          name: formData.name.trim(),
+          role: formData.role.trim(),
+          quote: formData.quote.trim(),
+          rating: Number(formData.rating),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Unable to submit review right now.');
+      }
+
+      setReviews((previous) => [data, ...previous]);
+      setCurrentIndex(0);
+      setFormData(emptyForm);
+      setSelectedFileName('');
+      setShowModal(false);
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : 'Unable to submit review right now.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const goPrev = () => setCurrentIndex((previous) => (previous - 1 + total) % total);
+  const goNext = () => setCurrentIndex((previous) => (previous + 1) % total);
 
   return (
     <section id="reviews" className="section-padding bg-sunset-cream relative overflow-hidden">
-      {/* Background decorative elements */}
       <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-5 pointer-events-none"
+        className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 rounded-full opacity-5 pointer-events-none"
         style={{ background: 'radial-gradient(circle, #C1447E, transparent)' }}
       />
 
-      <div className="max-w-7xl mx-auto">
-        {/* Header — matches reference layout */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-14">
-          <div className="reveal">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="sunset-divider" />
-              <span className="text-sunset-orange text-sm font-semibold tracking-widest uppercase">Testimonials</span>
-            </div>
+      <div className="max-w-5xl mx-auto">
+        {/* Header row: title + subtitle on the left, round nav control on the right — mirrors the reference screenshot */}
+        <div className="flex items-start justify-between gap-6 mb-10 reveal">
+          <div>
             <h2 className="font-serif text-4xl md:text-5xl font-bold text-sunset-dark">
               Client <span className="sunset-gradient-text">Reviews</span>
             </h2>
-            <p className="text-sunset-purple/65 mt-3 max-w-sm text-sm">
+            <p className="text-sunset-purple/60 mt-2 max-w-sm text-sm">
               Hear from the guests who have lived the NAGAS experience — their stories are our greatest reward.
             </p>
           </div>
 
-          {/* Navigation arrows */}
-          <div className="flex gap-3 reveal">
+          <div className="flex items-center gap-2 shrink-0">
             <button
-              onClick={() => setCurrentPage(p => Math.max(0, p - 1))}
-              disabled={currentPage === 0}
-              className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                currentPage === 0
-                  ? 'border-gray-200 text-gray-300 cursor-not-allowed'
-                  : 'border-sunset-orange text-sunset-orange hover:bg-sunset-orange hover:text-white'
-              }`}
-              aria-label="Previous reviews"
+              onClick={goPrev}
+              disabled={total <= 1}
+              className="w-11 h-11 rounded-full flex items-center justify-center border-2 border-sunset-orange text-sunset-orange transition-all duration-300 hover:bg-sunset-orange hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="Previous review"
             >
               ←
             </button>
             <button
-              onClick={() => setCurrentPage(p => Math.min(totalPages - 1, p + 1))}
-              disabled={currentPage === totalPages - 1}
-              className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-300 ${
-                currentPage === totalPages - 1
-                  ? 'border-gray-200 text-gray-300 cursor-not-allowed'
-                  : 'border-sunset-orange text-sunset-orange hover:bg-sunset-orange hover:text-white'
-              }`}
-              aria-label="Next reviews"
+              onClick={goNext}
+              disabled={total <= 1}
+              className="w-11 h-11 rounded-full flex items-center justify-center border-2 border-sunset-orange text-sunset-orange transition-all duration-300 hover:bg-sunset-orange hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+              aria-label="Next review"
             >
               →
             </button>
           </div>
         </div>
 
-        {/* Reviews Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {visibleReviews.map((review, i) => (
-            <div key={review.name} className="reveal" style={{ animationDelay: `${i * 100}ms` }}>
-              <ReviewCard {...review} />
-            </div>
-          ))}
+        {/* Single featured review card, styled per the screenshot */}
+        <div className="reveal">
+          {total > 0 ? (
+            <ReviewCard {...reviews[currentIndex]} />
+          ) : (
+            <p className="text-sunset-purple/70">No reviews yet — be the first to add one.</p>
+          )}
         </div>
 
-        {/* Pagination Dots */}
-        <div className="flex justify-center gap-2 mt-10">
-          {[...Array(totalPages)].map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentPage(i)}
-              className={`rounded-full transition-all duration-300 ${
-                i === currentPage
-                  ? 'w-8 h-3 bg-sunset-orange'
-                  : 'w-3 h-3 bg-sunset-orange/25 hover:bg-sunset-orange/50'
-              }`}
-              aria-label={`Go to page ${i + 1}`}
-            />
-          ))}
+        {/* Dots + add-review action */}
+        <div className="mt-8 flex items-center justify-between gap-6">
+          <div className="flex gap-2">
+            {reviews.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentIndex(i)}
+                aria-label={`Go to review ${i + 1}`}
+                className={`h-2.5 rounded-full transition-all duration-300 ${
+                  i === currentIndex ? 'w-6 bg-sunset-orange' : 'w-2.5 bg-sunset-orange/25'
+                }`}
+              />
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setShowModal(true)}
+            className="rounded-full bg-sunset-orange px-5 py-2 text-sm font-semibold text-white hover:bg-sunset-pink"
+          >
+            Add a review
+          </button>
         </div>
+
+        {/* Modal form for adding a review */}
+        {showModal ? (
+          <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/50" onClick={() => setShowModal(false)} />
+             
+             <div className="relative z-10 w-full max-w-2xl rounded-2xl bg-white p-6 shadow-lg">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="font-serif text-2xl font-semibold text-sunset-dark">Share your valuable review</h3>
+                  <p className="text-sunset-purple/70 text-sm mt-1">Add your story, upload a photo, and let your review appear here.</p>
+                </div>
+                <button type="button" onClick={() => setShowModal(false)} className="text-sunset-purple/60">✕</button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="text-sm font-medium text-sunset-dark">Name</label>
+                  <input
+                    value={formData.name}
+                    onChange={(event) => setFormData((previous) => ({ ...previous, name: event.target.value }))}
+                    className="mt-2 w-full rounded-2xl border border-sunset-orange/20 bg-white px-4 py-3 text-sm outline-none focus:border-sunset-orange"
+                    placeholder="Your name"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-sunset-dark">Role</label>
+                  <input
+                    value={formData.role}
+                    onChange={(event) => setFormData((previous) => ({ ...previous, role: event.target.value }))}
+                    className="mt-2 w-full rounded-2xl border border-sunset-orange/20 bg-white px-4 py-3 text-sm outline-none focus:border-sunset-orange"
+                    placeholder="Travel Blogger, London"
+                  />
+                </div>
+                <div className="md:col-span-2">
+                  <label className="text-sm font-medium text-sunset-dark">Review</label>
+                  <textarea
+                    value={formData.quote}
+                    onChange={(event) => setFormData((previous) => ({ ...previous, quote: event.target.value }))}
+                    rows={4}
+                    className="mt-2 w-full rounded-2xl border border-sunset-orange/20 bg-white px-4 py-3 text-sm outline-none focus:border-sunset-orange"
+                    placeholder="Tell us about your stay..."
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-sunset-dark">Rating</label>
+                  <select
+                    value={formData.rating}
+                    onChange={(event) => setFormData((previous) => ({ ...previous, rating: Number(event.target.value) }))}
+                    className="mt-2 w-full rounded-2xl border border-sunset-orange/20 bg-white px-4 py-3 text-sm outline-none focus:border-sunset-orange"
+                  >
+                    {[5, 4, 3, 2, 1].map((value) => (
+                      <option key={value} value={value}>
+                        {value} star{value > 1 ? 's' : ''}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-sunset-dark">Gender for your icon</label>
+                  <select
+                    value={formData.gender ?? 'other'}
+                    onChange={(event) => setFormData((previous) => ({ ...previous, gender: event.target.value as ReviewProps['gender'] }))}
+                    className="mt-2 w-full rounded-2xl border border-sunset-orange/20 bg-white px-4 py-3 text-sm outline-none focus:border-sunset-orange"
+                  >
+                    <option value="other">Other</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                  </select>
+                </div>
+                <div className="md:col-span-2">
+                  <label className="text-sm font-medium text-sunset-dark">Upload photo (optional)</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="mt-2 block w-full rounded-2xl border border-dashed border-sunset-orange/30 bg-white px-4 py-3 text-sm file:mr-4 file:rounded-full file:border-0 file:bg-sunset-orange file:px-4 file:py-2 file:text-white"
+                  />
+                  {selectedFileName ? <p className="mt-2 text-sm text-sunset-purple/70">Selected: {selectedFileName}</p> : null}
+                </div>
+                {error ? <p className="md:col-span-2 text-sm text-rose-600">{error}</p> : null}
+                <div className="md:col-span-2 flex flex-wrap items-center gap-3">
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="rounded-full bg-sunset-orange px-6 py-3 text-sm font-semibold text-white transition hover:bg-sunset-pink disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {submitting ? 'Sharing your review...' : 'Submit review'}
+                  </button>
+                  <p className="text-sm text-sunset-purple/70">If you skip the photo, a friendly avatar will appear based on your selected gender.</p>
+                </div>
+              </form>
+            </div>
+          </div>
+        ) : null}
       </div>
     </section>
   );
