@@ -3,7 +3,6 @@
 import Image from 'next/image';
 
 const stats = [
-  { value: '250+', label: 'Luxury Villas' },
   { value: '98%', label: 'Guest Satisfaction' },
   { value: '50+', label: 'Curated Experiences' },
   { value: '12', label: 'Private Beaches' },
@@ -110,7 +109,7 @@ export default function About() {
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mt-20">
           {stats.map((stat, i) => (
             <div
               key={stat.label}
