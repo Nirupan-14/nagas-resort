@@ -32,9 +32,9 @@ export default function About() {
           {/* Left: Image */}
           <div className="relative reveal-left">
             {/* Main image — arch silhouette, evokes a resort doorway/gate */}
-            <div className="relative mx-auto max-w-[440px]">
+            <div className="relative mx-auto max-w-[460px]">
               <div
-                className="relative h-[520px] overflow-hidden shadow-sunset-lg"
+                className="relative h-[540px] overflow-hidden shadow-sunset-lg"
                 style={{ borderRadius: '220px 220px 16px 16px' }}
               >
                 <Image
@@ -68,10 +68,7 @@ export default function About() {
               </div>
             </div>
 
-            {/* Decorative ring */}
-            <div
-              className="absolute -top-8 -left-8 w-32 h-32 rounded-full border-2 border-dashed border-sunset-orange/20 animate-spin-slow"
-            />
+
           </div>
 
           {/* Right: Content */}
@@ -102,7 +99,15 @@ export default function About() {
               ))}
             </div>
 
-            <a href="#booking" className="btn-pill btn-sunset inline-flex">
+            <a
+              href="#booking"
+              onClick={(e) => {
+                e.preventDefault();
+                const el = document.getElementById('booking');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              className="btn-pill btn-sunset inline-flex items-center gap-2"
+            >
               Explore Our World →
             </a>
           </div>

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { roomOptions } from '@/data/rooms';
@@ -72,6 +73,13 @@ const properties: PropertyCard[] = [
 ];
 
 function RoomCard({ property, onSelect }: { property: PropertyCard; onSelect: () => void }) {
+  const [loading, setLoading] = useState(false);
+
+  const handleClick = () => {
+    setLoading(true);
+    onSelect();
+  };
+
   return (
     <div
       role="button"
@@ -120,13 +128,24 @@ function RoomCard({ property, onSelect }: { property: PropertyCard; onSelect: ()
 
           <button
             type="button"
+            disabled={loading}
             onClick={(event) => {
               event.stopPropagation();
-              onSelect();
+              handleClick();
             }}
-            className="inline-flex w-full justify-center rounded-full bg-sunset-dark px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-sunset-orange"
+            className="inline-flex w-full justify-center items-center gap-2 rounded-full bg-sunset-dark px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-sunset-orange disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Reserve now
+            {loading ? (
+              <>
+                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Reserving…
+              </>
+            ) : (
+              'Reserve now'
+            )}
           </button>
         </div>
       </div>
@@ -136,6 +155,7 @@ function RoomCard({ property, onSelect }: { property: PropertyCard; onSelect: ()
 
 export default function RoomsGrid() {
   const router = useRouter();
+  const [starting, setStarting] = useState(false);
 
   const handleSelectRoom = (property: PropertyCard) => {
     router.push(`/reserve/${property.roomSlug}`);
@@ -182,10 +202,24 @@ export default function RoomsGrid() {
 
             <button
               type="button"
-              onClick={() => router.push(`/reserve/${roomOptions[0].value}`)}
-              className="btn-pill btn-sunset h-fit self-start text-sm"
+              disabled={starting}
+              onClick={() => {
+                setStarting(true);
+                router.push(`/reserve/${roomOptions[0].value}`);
+              }}
+              className="btn-pill btn-sunset h-fit self-start text-sm inline-flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Start reservation
+              {starting ? (
+                <>
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Starting…
+                </>
+              ) : (
+                'Start reservation'
+              )}
             </button>
           </div>
         </div>

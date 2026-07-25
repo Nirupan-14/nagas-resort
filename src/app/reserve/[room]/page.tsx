@@ -20,6 +20,7 @@ export default function ReservePage() {
     notes: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
@@ -28,12 +29,16 @@ export default function ReservePage() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setTimeout(() => {
+      setSubmitting(false);
+      setSubmitted(true);
+    }, 1500);
   };
 
   return (
     <main className="min-h-screen bg-sunset-cream text-sunset-dark">
-      <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
+      <div className="mx-auto max-w-7xl px-6 pt-28 pb-10 lg:px-8">
         <Link href="/" className="inline-flex items-center gap-2 rounded-full border border-sunset-gold/20 bg-white/80 px-4 py-2 text-sm font-semibold text-sunset-dark transition hover:border-sunset-orange/40">
           ← Back to resort
         </Link>
@@ -167,8 +172,18 @@ export default function ReservePage() {
                 </label>
               </div>
 
-              <button type="submit" className="btn-pill btn-sunset px-5 py-3 text-sm">
-                Reserve now
+              <button type="submit" disabled={submitting} className="btn-pill btn-sunset px-5 py-3 text-sm inline-flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+                {submitting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Reserving…
+                  </>
+                ) : (
+                  'Reserve now'
+                )}
               </button>
 
               {submitted && (

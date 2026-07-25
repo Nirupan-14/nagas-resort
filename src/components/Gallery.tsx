@@ -133,57 +133,64 @@ export default function Gallery() {
       {/* Lightbox */}
       {lightboxImage && (
         <div
-          className="lightbox-overlay fixed inset-0 z-50 bg-sunset-dark"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#1b2a4af5]  p-4 sm:p-8"
           onClick={closeLightbox}
           role="dialog"
           aria-modal="true"
           aria-label="Image lightbox"
         >
           <div
-            className="absolute inset-0"
+            className="relative w-full max-w-[95vw] max-h-[92vh] rounded-3xl overflow-hidden shadow-2xl bg-sunset-dark"
             onClick={(e) => e.stopPropagation()}
           >
-            <Image
-              src={lightboxImage.src}
-              alt={lightboxImage.alt}
-              fill
-              className="w-full h-full object-cover"
-              sizes="100vw"
-              priority
-            />
-          </div>
-
-          <button
-            onClick={closeLightbox}
-            className="absolute top-6 right-6 z-10 w-12 h-12 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white text-xl transition-all"
-            aria-label="Close lightbox"
-          >
-            ✕
-          </button>
-
-          <button
-            onClick={showPrev}
-            className="absolute left-4 md:left-8 top-1/2 -translate-y-1/2 z-10 w-11 h-11 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white text-lg transition-all"
-            aria-label="Previous image"
-          >
-            ‹
-          </button>
-          <button
-            onClick={showNext}
-            className="absolute right-4 md:right-8 top-1/2 -translate-y-1/2 z-10 w-11 h-11 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center text-white text-lg transition-all"
-            aria-label="Next image"
-          >
-            ›
-          </button>
-
-          <div className="absolute bottom-0 left-0 right-0 z-10 p-6 bg-gradient-to-t from-sunset-dark/80 to-transparent flex items-end justify-between gap-4">
-            <div>
-              <p className="text-white font-medium">{lightboxImage.alt}</p>
-              <p className="text-white/60 text-sm capitalize">{lightboxImage.category}</p>
+            <div className="relative w-full h-full min-h-[500px] sm:min-h-[700px]">
+              <Image
+                src={lightboxImage.src}
+                alt={lightboxImage.alt}
+                fill
+                className="object-contain"
+                sizes="95vw"
+                priority
+              />
             </div>
-            <p className="text-white/50 text-xs font-medium tabular-nums shrink-0">
-              {(lightboxIndex ?? 0) + 1} / {filtered.length}
-            </p>
+
+            {/* Close */}
+            <button
+              onClick={closeLightbox}
+              className="absolute top-4 right-4 z-10 w-10 h-10 bg-white/15 hover:bg-white/25 backdrop-blur-sm rounded-full flex items-center justify-center text-white text-sm transition-all"
+              aria-label="Close lightbox"
+            >
+              ✕
+            </button>
+
+            {/* Prev */}
+            <button
+              onClick={showPrev}
+              className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/15 hover:bg-white/25 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-all"
+              aria-label="Previous image"
+            >
+              ‹
+            </button>
+
+            {/* Next */}
+            <button
+              onClick={showNext}
+              className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/15 hover:bg-white/25 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-all"
+              aria-label="Next image"
+            >
+              ›
+            </button>
+
+            {/* Bottom info bar */}
+            <div className="absolute bottom-0 left-0 right-0 z-10 px-6 py-4 bg-gradient-to-t from-black/60 to-transparent flex items-end justify-between">
+              <div>
+                <p className="text-white font-medium text-sm">{lightboxImage.alt}</p>
+                <p className="text-white/50 text-xs capitalize">{lightboxImage.category}</p>
+              </div>
+              <p className="text-white/40 text-xs font-medium tabular-nums">
+                {(lightboxIndex ?? 0) + 1} / {filtered.length}
+              </p>
+            </div>
           </div>
         </div>
       )}

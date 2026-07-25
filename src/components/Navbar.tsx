@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import type { NavItem } from '@/types';
 
 const navItems: NavItem[] = [
@@ -17,9 +17,15 @@ const navItems: NavItem[] = [
 ];
 
 export default function Navbar() {
+  const pathname = usePathname();
+  const isReservePage = pathname.startsWith('/reserve');
+
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('home');
+  const [bookingLoading, setBookingLoading] = useState(false);
+
+  const showScrolledStyle = scrolled || isReservePage;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -59,10 +65,16 @@ export default function Navbar() {
     setMobileOpen(false);
   };
 
+  const handleBookingClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    setBookingLoading(true);
+    handleNavClick(e, '#booking');
+    setTimeout(() => setBookingLoading(false), 1500);
+  };
+
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled ? 'navbar-scrolled' : 'bg-transparent'
+        showScrolledStyle ? 'navbar-scrolled' : 'bg-transparent'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -78,7 +90,7 @@ export default function Navbar() {
             </div>
             <span
               className={`font-serif text-xl font-bold tracking-wide transition-colors duration-300 ${
-                scrolled ? 'text-sunset-dark' : 'text-white'
+                showScrolledStyle ? 'text-sunset-dark' : 'text-white'
               }`}
             >
               NAGAS
@@ -93,7 +105,7 @@ export default function Navbar() {
                 href={item.href}
                 onClick={(e) => handleNavClick(e, item.href)}
                 className={`relative px-4 py-2 text-sm font-medium transition-all duration-300 rounded-full group ${
-                  scrolled ? 'text-sunset-dark' : 'text-white/90'
+                  showScrolledStyle ? 'text-sunset-dark' : 'text-white/90'
                 } hover:text-sunset-orange`}
               >
                 {item.label}
@@ -108,21 +120,22 @@ export default function Navbar() {
 
           {/* CTA */}
           <div className="hidden lg:flex items-center gap-3">
-            <span
-              className={`text-xs font-semibold px-3 py-1.5 rounded-full border transition-all ${
-                scrolled
-                  ? 'border-sunset-orange/30 text-sunset-orange bg-sunset-orange/5'
-                  : 'border-white/30 text-white bg-white/10'
-              }`}
-            >
-              Est. 2026
-            </span>
             <a
               href="#booking"
-              onClick={(e) => handleNavClick(e, '#booking')}
-              className="btn-pill btn-sunset text-sm py-2.5 px-5"
+              onClick={handleBookingClick}
+              className={`btn-pill btn-sunset text-sm py-2.5 px-5 inline-flex items-center gap-2 ${bookingLoading ? 'pointer-events-none opacity-70' : ''}`}
             >
-              Book Now
+              {bookingLoading ? (
+                <>
+                  <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  Opening…
+                </>
+              ) : (
+                'Book Now'
+              )}
             </a>
           </div>
 
@@ -130,7 +143,7 @@ export default function Navbar() {
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
             className={`lg:hidden flex flex-col gap-1.5 p-2 transition-colors ${
-              scrolled ? 'text-sunset-dark' : 'text-white'
+              showScrolledStyle ? 'text-sunset-dark' : 'text-white'
             }`}
             aria-label="Toggle menu"
           >
@@ -165,10 +178,20 @@ export default function Navbar() {
           ))}
           <a
             href="#booking"
-            onClick={(e) => handleNavClick(e, '#booking')}
-            className="btn-pill btn-sunset text-center mt-2"
+            onClick={handleBookingClick}
+            className={`btn-pill btn-sunset text-center mt-2 inline-flex items-center justify-center gap-2 ${bookingLoading ? 'pointer-events-none opacity-70' : ''}`}
           >
-            Book Now
+            {bookingLoading ? (
+              <>
+                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Opening…
+              </>
+            ) : (
+              'Book Now'
+            )}
           </a>
         </div>
       </div>

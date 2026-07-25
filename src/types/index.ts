@@ -31,9 +31,7 @@ export interface ReviewProps {
   name: string;
   role: string;
   quote: string;
-  image?: string;
   rating: number;
-  gender?: 'male' | 'female' | 'other';
   createdAt?: string;
 }
 

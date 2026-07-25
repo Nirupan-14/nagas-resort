@@ -26,6 +26,7 @@ export default function DiningReservationPage() {
     requests: '',
   });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const selectedPackage = diningPackages.find((pkg) => pkg.value === formData.package);
   const total = selectedPackage ? selectedPackage.price * Number(formData.people) : 0;
@@ -37,12 +38,16 @@ export default function DiningReservationPage() {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+    setTimeout(() => {
+      setSubmitting(false);
+      setSubmitted(true);
+    }, 1500);
   };
 
   return (
     <main className="min-h-screen bg-sunset-cream text-sunset-dark">
-      <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
+      <div className="mx-auto max-w-7xl px-6 pt-28 pb-10 lg:px-8">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-sm uppercase tracking-[0.32em] text-sunset-orange font-semibold mb-3">Dining Reservation</p>
@@ -232,9 +237,20 @@ export default function DiningReservationPage() {
 
               <button
                 type="submit"
-                className="w-full rounded-full bg-sunset-dark px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-sunset-orange"
+                disabled={submitting}
+                className="w-full rounded-full bg-sunset-dark px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-sunset-orange inline-flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                Confirm dining reservation
+                {submitting ? (
+                  <>
+                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Confirming…
+                  </>
+                ) : (
+                  'Confirm dining reservation'
+                )}
               </button>
 
               {submitted && (
