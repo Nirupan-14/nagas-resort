@@ -14,17 +14,40 @@ const initialForm: ContactForm = {
 export default function Contact() {
   const [form, setForm] = useState<ContactForm>(initialForm);
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setForm(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setForm(initialForm);
-    setTimeout(() => setSubmitted(false), 4000);
+    setSending(true);
+    setError('');
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send message.');
+      }
+
+      setSubmitted(true);
+      setForm(initialForm);
+      setTimeout(() => setSubmitted(false), 4000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to send message. Please try again later.');
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -69,8 +92,8 @@ export default function Contact() {
                   <p className="text-sunset-purple/70 text-sm leading-relaxed">
                     NAGAS Resort & Spa<br />
                     123 Sunset Cove Drive<br />
-                    Tropical Island Paradise<br />
-                    Thailand 83150
+                    Jaffna<br />
+                    Sri Lanka
                   </p>
                 </div>
               </div>
@@ -105,25 +128,32 @@ export default function Contact() {
               </div>
             </div>
 
-            {/* Embedded Map placeholder */}
+            {/* Embedded Map */}
             <div className="resort-card overflow-hidden reveal">
-              <div
-                className="h-48 relative flex items-center justify-center"
-                style={{ background: 'linear-gradient(135deg, #FFF8F0, #FFE4CC)' }}
-              >
-                <div className="text-center">
-                  <div className="text-4xl mb-2">🗺️</div>
-                  <p className="text-sunset-orange font-semibold text-sm">Interactive Map</p>
-                  <p className="text-sunset-purple/50 text-xs">NAGAS Resort, Thailand</p>
-                  <a
-                    href="https://maps.google.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block mt-3 btn-pill btn-sunset text-xs py-2 px-4"
-                  >
-                    Open in Maps →
-                  </a>
+              <div className="relative h-72">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63371.81615847076!2d80.0040838!3d9.6615028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3aff034a1e2d6e8b%3A0x2b0365b6c7e3c44a!2sJaffna%2C%20Sri%20Lanka!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="NAGAS Resort Location - Jaffna, Sri Lanka"
+                  className="absolute inset-0"
+                />
+                <div className="absolute bottom-4 left-4 rounded-xl bg-white/95 backdrop-blur-sm px-4 py-2.5 shadow-lg border border-sunset-orange/10">
+                  <p className="text-sunset-orange font-semibold text-sm">NAGAS Resort</p>
+                  <p className="text-sunset-purple/60 text-xs">Jaffna, Sri Lanka</p>
                 </div>
+                <a
+                  href="https://maps.google.com/?q=Jaffna+Sri+Lanka"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="absolute top-4 right-4 rounded-full bg-white/95 backdrop-blur-sm px-4 py-2 text-xs font-semibold text-sunset-dark shadow-lg border border-sunset-orange/10 hover:bg-sunset-orange hover:text-white transition-colors"
+                >
+                  Open in Maps →
+                </a>
               </div>
             </div>
           </div>
@@ -133,7 +163,13 @@ export default function Contact() {
             <div className="resort-card p-8">
               <h3 className="font-serif text-2xl font-bold text-sunset-dark mb-6">Send a Message</h3>
 
-              {submitted && (
+                {error && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-center animate-fade-in">
+                    <p className="text-red-600 text-sm font-semibold">{error}</p>
+                  </div>
+                )}
+
+                {submitted && (
                 <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-2xl text-center animate-fade-in">
                   <p className="text-green-700 font-semibold">✅ Message sent! We'll respond within 24 hours.</p>
                 </div>
@@ -216,8 +252,18 @@ export default function Contact() {
                   />
                 </div>
 
-                <button type="submit" className="btn-pill btn-sunset w-full py-4 text-base font-bold">
-                  Send Message →
+                <button type="submit" disabled={sending} className="btn-pill btn-sunset w-full py-4 text-base font-bold inline-flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed">
+                  {sending ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Sending…
+                    </>
+                  ) : (
+                    'Send Message →'
+                  )}
                 </button>
 
                 <p className="text-center text-xs text-sunset-purple/40 mt-4">

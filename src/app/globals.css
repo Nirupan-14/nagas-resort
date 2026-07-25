@@ -65,11 +65,6 @@ body {
   100% { background-position: 200% 0; }
 }
 
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 /* ===== UTILITY CLASSES ===== */
 .animate-fade-in { animation: fadeIn 0.8s ease-out forwards; }
 .animate-fade-up { animation: fadeUp 0.8s ease-out forwards; }
@@ -77,7 +72,6 @@ body {
 .animate-fade-right { animation: fadeRight 0.8s ease-out forwards; }
 .animate-float { animation: float 6s ease-in-out infinite; }
 .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-.animate-spin-slow { animation: spin-slow 15s linear infinite; }
 
 .animation-delay-100 { animation-delay: 100ms; }
 .animation-delay-200 { animation-delay: 200ms; }

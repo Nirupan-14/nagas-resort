@@ -16,9 +16,9 @@ const FacebookIcon = ({ className }: IconProps) => (
   </svg>
 );
 
-const TwitterIcon = ({ className }: IconProps) => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.75} className={className}>
-    <path d="M4 4l7.5 9.5L4.3 20H6l6.2-5.9L17 20h3l-7.8-9.9L19.5 4h-1.7l-5.7 5.4L7 4H4z" />
+const TiktokIcon = ({ className }: IconProps) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05A6.34 6.34 0 003.15 15.3a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V9.25a8.28 8.28 0 004.76 1.5v-3.4a4.85 4.85 0 01-1-.66z" />
   </svg>
 );
 
@@ -90,8 +90,8 @@ export default function Footer() {
               {[
                 { label: 'Instagram', Icon: InstagramIcon },
                 { label: 'Facebook', Icon: FacebookIcon },
-                { label: 'Twitter/X', Icon: TwitterIcon },
                 { label: 'YouTube', Icon: YoutubeIcon },
+                { label: 'TikTok', Icon: TiktokIcon },
               ].map(({ label, Icon }) => (
                 <a
                   key={label}
@@ -141,7 +141,7 @@ export default function Footer() {
                 <MapPinIcon className="w-4 h-4 text-[#2b2313] mt-0.5 shrink-0" />
                 <p className="text-white/80 text-sm leading-relaxed">
                   123 Sunset Cove Drive<br />
-                  Thailand 83150
+                  Jaffna, Sri Lanka
                 </p>
               </li>
               <li className="flex gap-3">
@@ -182,6 +182,9 @@ export default function Footer() {
               </a>
             ))}
           </div>
+          <p className="text-white/70 text-xs">
+            Developed by <span className="text-white font-semibold">SRIT</span>
+          </p>
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 bg-white rounded-full" />
             <span className="text-white/70 text-xs">Concierge Online 24/7</span>

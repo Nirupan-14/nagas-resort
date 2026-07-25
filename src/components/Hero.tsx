@@ -1,11 +1,16 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
 
 export default function Hero() {
+  const [loading, setLoading] = useState(false);
+
   const handleScroll = (href: string) => {
+    setLoading(true);
     const el = document.getElementById(href.replace('#', ''));
     if (el) el.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => setLoading(false), 1500);
   };
 
   return (
@@ -57,9 +62,20 @@ export default function Hero() {
         <div className="animate-fade-up animation-delay-400">
           <button
             onClick={() => handleScroll('#booking')}
-            className="px-8 py-3 bg-sunset-gold/90 hover:bg-sunset-gold text-sunset-dark font-semibold rounded-md transition-all duration-300 shadow-lg hover:shadow-xl"
+            disabled={loading}
+            className="px-8 py-3 bg-sunset-gold/90 hover:bg-sunset-gold text-sunset-dark font-semibold rounded-md transition-all duration-300 shadow-lg hover:shadow-xl inline-flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Explore Luxury Stays
+            {loading ? (
+              <>
+                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+                Loading…
+              </>
+            ) : (
+              'Explore Luxury Stays'
+            )}
           </button>
         </div>
       </div>
