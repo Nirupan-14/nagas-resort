@@ -220,16 +220,16 @@ export default function Booking() {
 
       <div className="max-w-5xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-8 sm:mb-10">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="h-px w-12 bg-white/40" />
-            <span className="text-white/85 text-sm font-semibold tracking-widest uppercase">Reservations</span>
-            <div className="h-px w-12 bg-white/40" />
+            <div className="h-px w-8 sm:w-12 bg-white/40" />
+            <span className="text-white/85 text-xs sm:text-sm font-semibold tracking-widest uppercase">Reservations</span>
+            <div className="h-px w-8 sm:w-12 bg-white/40" />
           </div>
-          <h2 className="font-serif text-4xl md:text-5xl font-bold text-white [text-shadow:0_2px_18px_rgba(0,0,0,0.25)]">
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-white [text-shadow:0_2px_18px_rgba(0,0,0,0.25)]">
             Book Your <span style={{ color: '#FFC15E' }}>Experience</span>
           </h2>
-          <p className="text-white/90 mt-4 max-w-2xl mx-auto text-base leading-relaxed">
+          <p className="text-white/90 mt-3 sm:mt-4 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed px-2">
             Plan your perfect escape — from accommodations to dining and private transfers, we handle every detail with refined care.
           </p>
         </div>
@@ -271,7 +271,7 @@ export default function Booking() {
         </div>
 
         {/* Tab Selector */}
-        <div className="flex gap-2 p-1.5 bg-white/10 backdrop-blur-sm rounded-2xl mb-8 reveal">
+        <div className="flex gap-1.5 sm:gap-2 p-1 sm:p-1.5 bg-white/10 backdrop-blur-sm rounded-xl sm:rounded-2xl mb-6 sm:mb-8 reveal">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -279,22 +279,22 @@ export default function Booking() {
               type="button"
               onClick={() => switchTab(tab.id)}
               aria-selected={activeTab === tab.id}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-sm font-medium transition-all duration-300 ${
+              className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium transition-all duration-300 ${
                 activeTab === tab.id
                   ? 'bg-white text-sunset-orange shadow-md scale-[1.02]'
                   : 'text-white/80 hover:text-white hover:bg-white/10'
               }`}
             >
-              <span>{tab.icon}</span>
+              <span className="text-base sm:text-lg">{tab.icon}</span>
               <span className="hidden sm:inline">{tab.label}</span>
             </button>
           ))}
         </div>
 
         {/* Form + Summary layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-5 sm:gap-6">
           {/* Form Card */}
-          <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 shadow-sunset-lg reveal">
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-5 sm:p-8 shadow-sunset-lg reveal">
             {status === 'success' && (
               <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-2xl text-center animate-[fadeIn_0.3s_ease]">
                 <p className="text-green-700 font-semibold">✅ Booking request sent! We'll confirm within 24 hours.</p>
@@ -553,7 +553,8 @@ export default function Booking() {
               <button
                 type="submit"
                 disabled={status === 'submitting'}
-                className="btn-pill btn-sunset w-full mt-8 py-4 text-base font-bold disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full mt-6 sm:mt-8 py-3.5 sm:py-4 rounded-full font-bold text-sm sm:text-base transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                style={{ background: 'linear-gradient(135deg, #C49A3C, #8B6914)', color: '#FDF8EE', boxShadow: '0 4px 20px rgba(196, 154, 60, 0.35)' }}
               >
                 {status === 'submitting' ? (
                   <>
@@ -561,7 +562,7 @@ export default function Booking() {
                     Sending request...
                   </>
                 ) : (
-                  <>Confirm Reservation →</>
+                  <span className="truncate">Confirm Reservation →</span>
                 )}
               </button>
             </form>

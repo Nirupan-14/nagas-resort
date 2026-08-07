@@ -34,26 +34,26 @@ export default function Hero() {
       {/* Content */}
       <div className="relative z-10 w-full h-full flex flex-col items-center justify-center px-6 py-20">
         {/* Logo Section */}
-        <div className="mb-12 animate-fade-up">
+        <div className="mb-8 sm:mb-12 animate-fade-up">
           <div className="text-center">
-            <div className="text-5xl font-serif font-bold text-white mb-2">N</div>
-            <h2 className="text-xl font-serif text-white/90 tracking-widest">NAGAS RESORTS & HOLIDAYS</h2>
+            <div className="text-3xl sm:text-5xl font-serif font-bold text-white mb-2">N</div>
+            <h2 className="text-base sm:text-xl font-serif text-white/90 tracking-widest">NAGAS RESORTS & HOLIDAYS</h2>
           </div>
         </div>
 
         {/* Main Headline */}
-        <div className="animate-fade-up animation-delay-200 mb-4">
-          <h1 className="font-serif text-5xl sm:text-6xl md:text-7xl font-bold text-white leading-tight">
+        <div className="animate-fade-up animation-delay-200 mb-4 px-4">
+          <h1 className="font-serif text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight text-center">
             Welcome to Nagas
           </h1>
-          <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-tight">
+          <h1 className="font-serif text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight text-center">
             Resorts & Holidays
           </h1>
         </div>
 
         {/* Subheadline */}
-        <div className="animate-fade-up animation-delay-300 mb-8">
-          <p className="text-xl sm:text-2xl text-white/90 font-light tracking-wider">
+        <div className="animate-fade-up animation-delay-300 mb-6 sm:mb-8 px-4">
+          <p className="text-base sm:text-xl md:text-2xl text-white/90 font-light tracking-wider text-center">
             Thoughtful Spaces · Timeless Stays
           </p>
         </div>

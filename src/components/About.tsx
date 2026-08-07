@@ -28,13 +28,13 @@ export default function About() {
           <span className="text-sunset-orange text-sm font-semibold tracking-widest uppercase">Our Story</span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           {/* Left: Image */}
-          <div className="relative reveal-left">
+          <div className="reveal-left">
             {/* Main image — arch silhouette, evokes a resort doorway/gate */}
             <div className="relative mx-auto max-w-[460px]">
               <div
-                className="relative h-[540px] overflow-hidden shadow-sunset-lg"
+                className="relative h-[320px] sm:h-[420px] md:h-[540px] overflow-hidden shadow-sunset-lg"
                 style={{ borderRadius: '220px 220px 16px 16px' }}
               >
                 <Image
@@ -58,7 +58,7 @@ export default function About() {
             </div>
 
             {/* Floating accent card */}
-            <div className="absolute -bottom-6 -right-2 sm:-right-6 bg-white rounded-2xl p-5 shadow-card-hover border border-sunset-orange/10">
+            <div className="absolute -bottom-6 left-4 sm:left-auto sm:-right-2 sm:-right-6 bg-white rounded-2xl p-4 sm:p-5 shadow-card-hover border border-sunset-orange/10">
               <p className="text-3xl font-bold font-serif sunset-gradient-text">98%</p>
               <p className="text-sm text-sunset-purple font-medium mt-1">Guest Satisfaction Rating</p>
               <div className="flex gap-0.5 mt-2">
@@ -114,7 +114,7 @@ export default function About() {
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mt-20">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mt-12 sm:mt-20">
           {stats.map((stat, i) => (
             <div
               key={stat.label}

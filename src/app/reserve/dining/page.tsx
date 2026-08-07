@@ -47,14 +47,14 @@ export default function DiningReservationPage() {
 
   return (
     <main className="min-h-screen bg-sunset-cream text-sunset-dark">
-      <div className="mx-auto max-w-7xl px-6 pt-28 pb-10 lg:px-8">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 pt-24 sm:pt-28 pb-8 sm:pb-10 lg:px-8">
+        <div className="flex flex-col gap-5 sm:gap-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.32em] text-sunset-orange font-semibold mb-3">Dining Reservation</p>
-            <h1 className="font-serif text-4xl md:text-5xl font-bold text-sunset-dark leading-tight">
+            <p className="text-xs sm:text-sm uppercase tracking-[0.32em] text-sunset-orange font-semibold mb-3">Dining Reservation</p>
+            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-sunset-dark leading-tight">
               Secure your table in our signature dining venue.
             </h1>
-            <p className="mt-5 max-w-2xl text-sm leading-relaxed text-sunset-purple/75">
+            <p className="mt-4 sm:mt-5 max-w-2xl text-xs sm:text-sm leading-relaxed text-sunset-purple/75">
               Experience handcrafted menus, elegant service, and unforgettable ambiance with a dedicated dining reservation page built for a refined guest journey.
             </p>
           </div>
@@ -67,8 +67,8 @@ export default function DiningReservationPage() {
         </div>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-          <section className="rounded-[2rem] border border-sunset-gold/20 bg-white/90 shadow-card overflow-hidden">
-            <div className="relative h-96 overflow-hidden">
+          <section className="rounded-[1.5rem] sm:rounded-[2rem] border border-sunset-gold/20 bg-white/90 shadow-card overflow-hidden">
+            <div className="relative h-60 sm:h-80 md:h-96 overflow-hidden">
               <Image
                 src="/images/dining.png"
                 alt="Fine dining experience"
@@ -82,10 +82,10 @@ export default function DiningReservationPage() {
               </div>
             </div>
 
-            <div className="p-8">
-              <div className="flex flex-col gap-3">
-                <span className="text-xs uppercase tracking-[0.3em] text-sunset-orange font-semibold">Designed for discerning guests</span>
-                <h2 className="font-serif text-3xl font-bold text-sunset-dark">Fine dining, personalized to your taste.</h2>
+            <div className="p-5 sm:p-8">
+              <div className="flex flex-col gap-2 sm:gap-3">
+                <span className="text-[0.65rem] sm:text-xs uppercase tracking-[0.3em] text-sunset-orange font-semibold">Designed for discerning guests</span>
+                <h2 className="font-serif text-2xl sm:text-3xl font-bold text-sunset-dark">Fine dining, personalized to your taste.</h2>
                 <p className="text-sm leading-relaxed text-sunset-purple/75">
                   Choose your dining package, reserve the perfect seating, and let our culinary team prepare a seamless meal experience.
                 </p>
@@ -103,13 +103,13 @@ export default function DiningReservationPage() {
             </div>
           </section>
 
-          <section className="rounded-[2rem] border border-sunset-gold/20 bg-white/95 p-8 shadow-card">
-            <div className="flex items-center justify-between gap-4 mb-8">
+          <section className="rounded-[1.5rem] sm:rounded-[2rem] border border-sunset-gold/20 bg-white/95 p-5 sm:p-8 shadow-card">
+            <div className="flex items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
               <div>
-                <p className="text-sm uppercase tracking-[0.3em] text-sunset-orange font-semibold">Reserve a table</p>
-                <h2 className="mt-3 text-3xl font-serif font-bold text-sunset-dark">Dining reservation form</h2>
+                <p className="text-xs sm:text-sm uppercase tracking-[0.3em] text-sunset-orange font-semibold">Reserve a table</p>
+                <h2 className="mt-2 sm:mt-3 text-2xl sm:text-3xl font-serif font-bold text-sunset-dark">Dining reservation form</h2>
               </div>
-              <span className="rounded-full border border-sunset-orange/20 bg-sunset-orange/10 px-3 py-1 text-xs uppercase tracking-[0.18em] text-sunset-orange font-semibold">
+              <span className="hidden sm:inline-flex rounded-full border border-sunset-orange/20 bg-sunset-orange/10 px-3 py-1 text-xs uppercase tracking-[0.18em] text-sunset-orange font-semibold shrink-0">
                 Book now
               </span>
             </div>
@@ -238,7 +238,8 @@ export default function DiningReservationPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full rounded-full bg-sunset-dark px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-sunset-orange inline-flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full rounded-full px-6 py-3.5 sm:py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-sunset-orange inline-flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{ background: '#1B2A4A' }}
               >
                 {submitting ? (
                   <>
@@ -246,10 +247,10 @@ export default function DiningReservationPage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                     </svg>
-                    Confirming…
+                    <span className="truncate">Confirming…</span>
                   </>
                 ) : (
-                  'Confirm dining reservation'
+                  <span className="truncate">Confirm dining reservation</span>
                 )}
               </button>
 

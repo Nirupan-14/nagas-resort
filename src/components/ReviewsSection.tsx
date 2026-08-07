@@ -103,27 +103,27 @@ export default function ReviewsSection() {
         style={{ background: 'radial-gradient(circle, #C1447E, transparent)' }}
       />
 
-      <div className="max-w-5xl mx-auto">
-        <div className="flex items-start justify-between gap-6 mb-10 reveal">
+      <div className="max-w-5xl mx-auto px-4 md:px-6">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 sm:gap-6 mb-8 md:mb-10 reveal">
           <div>
             <div className="flex items-center gap-3 mb-4">
               <div className="sunset-divider" />
-              <span className="text-sunset-orange text-sm font-semibold tracking-widest uppercase">Testimonials</span>
+              <span className="text-sunset-orange text-xs sm:text-sm font-semibold tracking-widest uppercase">Testimonials</span>
             </div>
 
-            <h2 className="font-serif text-4xl md:text-5xl font-bold text-sunset-dark">
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-sunset-dark">
               Client <span className="sunset-gradient-text">Reviews</span>
             </h2>
-            <p className="text-sunset-purple/60 mt-4 max-w-sm text-sm">
+            <p className="text-sunset-purple/60 mt-3 sm:mt-4 max-w-sm text-xs sm:text-sm">
               Hear from the guests who have lived the NAGAS experience — their stories are our greatest reward.
             </p>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-2 shrink-0 self-start">
             <button
               onClick={goPrev}
               disabled={total <= 1}
-              className="w-11 h-11 rounded-full flex items-center justify-center border-2 border-sunset-orange text-sunset-orange transition-all duration-300 hover:bg-sunset-orange hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center border-2 border-sunset-orange text-sunset-orange transition-all duration-300 hover:bg-sunset-orange hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Previous review"
             >
               ←
@@ -131,7 +131,7 @@ export default function ReviewsSection() {
             <button
               onClick={goNext}
               disabled={total <= 1}
-              className="w-11 h-11 rounded-full flex items-center justify-center border-2 border-sunset-orange text-sunset-orange transition-all duration-300 hover:bg-sunset-orange hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-full flex items-center justify-center border-2 border-sunset-orange text-sunset-orange transition-all duration-300 hover:bg-sunset-orange hover:text-white disabled:opacity-30 disabled:cursor-not-allowed"
               aria-label="Next review"
             >
               →
@@ -147,7 +147,7 @@ export default function ReviewsSection() {
           )}
         </div>
 
-        <div className="mt-8 flex items-center justify-between gap-6">
+        <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4 sm:gap-6">
           <div className="flex gap-2">
             {reviews.map((_, i) => (
               <button
@@ -164,60 +164,60 @@ export default function ReviewsSection() {
           <button
             type="button"
             onClick={() => setShowModal(true)}
-            className="rounded-full bg-sunset-orange px-5 py-2 text-sm font-semibold text-white hover:bg-sunset-pink"
+            className="rounded-full bg-sunset-orange px-5 py-2.5 text-sm font-semibold text-white hover:bg-sunset-pink"
           >
             Add a review
           </button>
         </div>
 
         {showModal ? (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <div className="absolute inset-0 bg-black/50" onClick={() => setShowModal(false)} />
 
-            <div className="relative z-10 w-full max-w-2xl rounded-2xl bg-white p-6 shadow-lg">
+            <div className="relative z-10 w-full max-w-2xl rounded-2xl bg-white p-5 sm:p-6 shadow-lg max-h-[90vh] overflow-y-auto">
               <div className="flex items-start justify-between">
                 <div>
-                  <h3 className="font-serif text-2xl font-semibold text-sunset-dark">Share your valuable review</h3>
-                  <p className="text-sunset-purple/70 text-sm mt-1">Add your story and let your review appear here.</p>
+                  <h3 className="font-serif text-xl sm:text-2xl font-semibold text-sunset-dark">Share your valuable review</h3>
+                  <p className="text-sunset-purple/70 text-xs sm:text-sm mt-1">Add your story and let your review appear here.</p>
                 </div>
-                <button type="button" onClick={() => setShowModal(false)} className="text-sunset-purple/60">✕</button>
+                <button type="button" onClick={() => setShowModal(false)} className="text-sunset-purple/60 text-lg shrink-0 ml-4">✕</button>
               </div>
 
-              <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-2">
+              <form onSubmit={handleSubmit} className="mt-5 sm:mt-6 grid gap-3 sm:gap-4 md:grid-cols-2">
                 <div>
-                  <label className="text-sm font-medium text-sunset-dark">Name</label>
+                  <label className="text-xs sm:text-sm font-medium text-sunset-dark">Name</label>
                   <input
                     value={formData.name}
                     onChange={(event) => setFormData((previous) => ({ ...previous, name: event.target.value }))}
-                    className="mt-2 w-full rounded-2xl border border-sunset-orange/20 bg-white px-4 py-3 text-sm outline-none focus:border-sunset-orange"
+                    className="mt-1.5 sm:mt-2 w-full rounded-2xl border border-sunset-orange/20 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-sm outline-none focus:border-sunset-orange"
                     placeholder="Your name"
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-sunset-dark">Role</label>
+                  <label className="text-xs sm:text-sm font-medium text-sunset-dark">Role</label>
                   <input
                     value={formData.role}
                     onChange={(event) => setFormData((previous) => ({ ...previous, role: event.target.value }))}
-                    className="mt-2 w-full rounded-2xl border border-sunset-orange/20 bg-white px-4 py-3 text-sm outline-none focus:border-sunset-orange"
+                    className="mt-1.5 sm:mt-2 w-full rounded-2xl border border-sunset-orange/20 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-sm outline-none focus:border-sunset-orange"
                     placeholder="Travel Blogger, London"
                   />
                 </div>
                 <div className="md:col-span-2">
-                  <label className="text-sm font-medium text-sunset-dark">Review</label>
+                  <label className="text-xs sm:text-sm font-medium text-sunset-dark">Review</label>
                   <textarea
                     value={formData.quote}
                     onChange={(event) => setFormData((previous) => ({ ...previous, quote: event.target.value }))}
-                    rows={4}
-                    className="mt-2 w-full rounded-2xl border border-sunset-orange/20 bg-white px-4 py-3 text-sm outline-none focus:border-sunset-orange"
+                    rows={3}
+                    className="mt-1.5 sm:mt-2 w-full rounded-2xl border border-sunset-orange/20 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-sm outline-none focus:border-sunset-orange"
                     placeholder="Tell us about your stay..."
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-sunset-dark">Rating</label>
+                  <label className="text-xs sm:text-sm font-medium text-sunset-dark">Rating</label>
                   <select
                     value={formData.rating}
                     onChange={(event) => setFormData((previous) => ({ ...previous, rating: Number(event.target.value) }))}
-                    className="mt-2 w-full rounded-2xl border border-sunset-orange/20 bg-white px-4 py-3 text-sm outline-none focus:border-sunset-orange"
+                    className="mt-1.5 sm:mt-2 w-full rounded-2xl border border-sunset-orange/20 bg-white px-3 sm:px-4 py-2.5 sm:py-3 text-sm outline-none focus:border-sunset-orange"
                   >
                     {[5, 4, 3, 2, 1].map((value) => (
                       <option key={value} value={value}>

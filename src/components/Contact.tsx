@@ -64,23 +64,23 @@ export default function Contact() {
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-14 reveal">
+        <div className="text-center mb-10 sm:mb-14 reveal">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="sunset-divider" />
-            <span className="text-sunset-orange text-sm font-semibold tracking-widest uppercase">Get In Touch</span>
+            <span className="text-sunset-orange text-xs sm:text-sm font-semibold tracking-widest uppercase">Get In Touch</span>
             <div className="sunset-divider" />
           </div>
-          <h2 className="font-serif text-4xl md:text-5xl font-bold text-sunset-dark">
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-sunset-dark">
             Contact <span className="sunset-gradient-text">Us</span>
           </h2>
-          <p className="text-sunset-purple/65 mt-4 max-w-xl mx-auto">
+          <p className="text-sunset-purple/65 mt-3 sm:mt-4 max-w-xl mx-auto text-sm sm:text-base px-2">
             Ready to begin your journey? Our concierge team is available 24/7 to craft your perfect escape.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12">
           {/* Contact Info */}
-          <div className="space-y-8 reveal-left">
+          <div className="space-y-6 sm:space-y-8 reveal-left">
             {/* Address card */}
             <div className="resort-card p-6">
               <div className="flex gap-4">
@@ -130,7 +130,7 @@ export default function Contact() {
 
             {/* Embedded Map */}
             <div className="resort-card overflow-hidden reveal">
-              <div className="relative h-72">
+              <div className="relative h-56 sm:h-72">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d63371.81615847076!2d80.0040838!3d9.6615028!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3aff034a1e2d6e8b%3A0x2b0365b6c7e3c44a!2sJaffna%2C%20Sri%20Lanka!5e0!3m2!1sen!2s!4v1700000000000!5m2!1sen!2s"
                   width="100%"
@@ -160,8 +160,8 @@ export default function Contact() {
 
           {/* Contact Form */}
           <div className="reveal-right">
-            <div className="resort-card p-8">
-              <h3 className="font-serif text-2xl font-bold text-sunset-dark mb-6">Send a Message</h3>
+            <div className="resort-card p-5 sm:p-8">
+              <h3 className="font-serif text-xl sm:text-2xl font-bold text-sunset-dark mb-5 sm:mb-6">Send a Message</h3>
 
                 {error && (
                   <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-center animate-fade-in">

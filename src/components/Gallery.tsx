@@ -52,22 +52,22 @@ export default function Gallery() {
     <section id="gallery" className="section-padding bg-white relative overflow-hidden">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12 reveal">
+        <div className="text-center mb-8 sm:mb-12 reveal">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="sunset-divider" />
-            <span className="text-sunset-orange text-sm font-semibold tracking-widest uppercase">Visual Journey</span>
+            <span className="text-sunset-orange text-xs sm:text-sm font-semibold tracking-widest uppercase">Visual Journey</span>
             <div className="sunset-divider" />
           </div>
-          <h2 className="font-serif text-4xl md:text-5xl font-bold text-sunset-dark">
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-sunset-dark">
             Our <span className="sunset-gradient-text">Gallery</span>
           </h2>
-          <p className="text-sunset-purple/65 mt-4 max-w-xl mx-auto">
+          <p className="text-sunset-purple/65 mt-3 sm:mt-4 max-w-xl mx-auto text-sm sm:text-base px-2">
             A glimpse into the world of NAGAS — where every corner is a frame-worthy moment.
           </p>
         </div>
 
         {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-3 mb-10 reveal">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-10 reveal">
           {categories.map((cat) => (
             <button
               key={cat}
@@ -143,7 +143,7 @@ export default function Gallery() {
             className="relative w-full max-w-[95vw] max-h-[92vh] rounded-3xl overflow-hidden shadow-2xl bg-sunset-dark"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="relative w-full h-full min-h-[500px] sm:min-h-[700px]">
+            <div className="relative w-full h-full min-h-[300px] sm:min-h-[500px] md:min-h-[700px]">
               <Image
                 src={lightboxImage.src}
                 alt={lightboxImage.alt}
