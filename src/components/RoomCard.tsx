@@ -48,15 +48,15 @@ export default function RoomCard({ room, variant = 'small' }: RoomCardProps) {
         </div>
 
         {/* Details Row */}
-        <div className="flex items-center justify-between">
-          <div className="flex gap-3 text-xs text-sunset-purple/50">
-            {room.size && <span>📐 {room.size}</span>}
-            {room.capacity && <span>👥 Up to {room.capacity} guests</span>}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex flex-wrap gap-2 sm:gap-3 text-xs text-sunset-purple/50">
+              {room.size && <span>📐 {room.size}</span>}
+              {room.capacity && <span>👥 Up to {room.capacity} guests</span>}
+            </div>
+            <button className="btn-pill btn-sunset text-xs py-2 px-4 self-start sm:self-auto">
+              Book
+            </button>
           </div>
-          <button className="btn-pill btn-sunset text-xs py-2 px-4">
-            Book
-          </button>
-        </div>
       </div>
     </div>
   );

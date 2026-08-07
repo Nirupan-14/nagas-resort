@@ -39,24 +39,24 @@ export default function GardenArea() {
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-16">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6 mb-10 sm:mb-16">
           <div className="reveal">
             <div className="flex items-center gap-3 mb-4">
               <div className="sunset-divider" />
-              <span className="text-sunset-orange text-sm font-semibold tracking-widest uppercase">Natural Paradise</span>
+              <span className="text-sunset-orange text-xs sm:text-sm font-semibold tracking-widest uppercase">Natural Paradise</span>
             </div>
-            <h2 className="font-serif text-4xl md:text-5xl font-bold text-sunset-dark">
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-sunset-dark">
               The Garden{' '}
               <span className="sunset-gradient-text">Experience</span>
             </h2>
           </div>
-          <p className="text-sunset-purple/65 max-w-md leading-relaxed reveal">
+          <p className="text-sunset-purple/65 max-w-md leading-relaxed text-sm sm:text-base reveal">
             Six acres of meticulously maintained tropical gardens, where every path leads to a discovery and every corner holds a moment of pure serenity.
           </p>
         </div>
 
         {/* Main Content */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 items-center mb-10 sm:mb-16">
           {/* Images collage */}
           <div className="relative reveal-left">
             {/* Offset frame behind primary image, signals depth without an organic blob */}
@@ -81,7 +81,7 @@ export default function GardenArea() {
             </div>
 
             {/* Overlapping secondary image */}
-            <div className="absolute -bottom-8 -right-4 md:-right-8 w-40 md:w-56 h-32 md:h-44 overflow-hidden shadow-card-hover border-4 border-white rounded-[20px]">
+            <div className="absolute -bottom-6 sm:-bottom-8 -right-4 md:-right-8 w-32 sm:w-40 md:w-56 h-24 sm:h-32 md:h-44 overflow-hidden shadow-card-hover border-4 border-white rounded-[20px]">
               <Image
                 src="/images/pool.png"
                 alt="Garden pool"
@@ -92,8 +92,8 @@ export default function GardenArea() {
             </div>
 
             {/* Floating stat */}
-            <div className="absolute top-8 -right-4 bg-white rounded-2xl p-4 shadow-card-hover border border-sunset-gold/20 animate-float">
-              <p className="text-2xl font-bold font-serif text-sunset-orange">6 Acres</p>
+            <div className="absolute top-6 sm:top-8 -right-2 sm:-right-4 bg-white rounded-2xl p-3 sm:p-4 shadow-card-hover border border-sunset-gold/20 animate-float">
+              <p className="text-lg sm:text-2xl font-bold font-serif text-sunset-orange">6 Acres</p>
               <p className="text-xs text-sunset-purple font-medium">Tropical Gardens</p>
             </div>
           </div>
@@ -125,7 +125,7 @@ export default function GardenArea() {
         </div>
 
         {/* Full-width panoramic banner */}
-        <div className="relative h-64 md:h-80 overflow-hidden shadow-sunset reveal rounded-3xl">
+        <div className="relative h-48 sm:h-64 md:h-80 overflow-hidden shadow-sunset reveal rounded-2xl sm:rounded-3xl">
           <Image
             src="/images/garden.png"
             alt="NAGAS Resort garden panorama"
@@ -137,8 +137,8 @@ export default function GardenArea() {
             className="absolute inset-0 flex items-center justify-center"
             style={{ background: 'linear-gradient(90deg, rgba(106, 44, 92, 0.7), rgba(255, 107, 53, 0.4), rgba(106, 44, 92, 0.7))' }}
           >
-            <div className="text-center text-white px-6">
-              <p className="font-serif text-3xl md:text-4xl font-bold mb-3">
+            <div className="text-center text-white px-4 sm:px-6">
+              <p className="font-serif text-xl sm:text-3xl md:text-4xl font-bold mb-2 sm:mb-3">
                 &ldquo;Where nature is the luxury&rdquo;
               </p>
               <p className="text-white/75">— NAGAS Resort Philosophy</p>

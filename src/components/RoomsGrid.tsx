@@ -169,10 +169,10 @@ export default function RoomsGrid() {
       />
 
       <div className="max-w-7xl mx-auto relative">
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between mb-10">
+        <div className="flex flex-col gap-6 sm:gap-8 lg:flex-row lg:items-start lg:justify-between mb-8 sm:mb-10">
           <div className="max-w-2xl">
-            <p className="text-sm uppercase tracking-[0.32em] text-sunset-orange font-semibold mb-3">Our Properties</p>
-            <h2 className="font-serif text-4xl md:text-5xl font-bold text-sunset-dark leading-tight">
+            <p className="text-xs sm:text-sm uppercase tracking-[0.32em] text-sunset-orange font-semibold mb-3">Our Properties</p>
+            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-sunset-dark leading-tight">
               Explore rooms first, then book the one that feels right.
             </h2>
           </div>
@@ -188,11 +188,11 @@ export default function RoomsGrid() {
           ))}
         </div>
 
-        <div className="mt-12 rounded-[2rem] border border-sunset-gold/20 bg-white/85 p-6 shadow-card backdrop-blur md:p-8">
+        <div className="mt-10 sm:mt-12 rounded-[2rem] border border-sunset-gold/20 bg-white/85 p-5 sm:p-6 shadow-card backdrop-blur md:p-8">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="max-w-2xl">
-              <p className="text-sm uppercase tracking-[0.3em] text-sunset-orange font-semibold mb-2">Reserve your stay</p>
-              <h3 className="font-serif text-3xl md:text-4xl font-bold text-sunset-dark leading-tight">
+              <p className="text-xs sm:text-sm uppercase tracking-[0.3em] text-sunset-orange font-semibold mb-2">Reserve your stay</p>
+              <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-sunset-dark leading-tight">
                 Choose a room and continue to a dedicated reservation page.
               </h3>
               <p className="mt-3 text-sm leading-relaxed text-sunset-purple/70">

@@ -68,8 +68,8 @@ export default function Footer() {
       className="relative"
       style={{ background: '#8B6914' }}
     >
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 py-12 sm:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12">
 
           {/* Brand Column */}
           <div className="lg:col-span-2">
@@ -171,11 +171,11 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-white/25 mt-14 pt-7 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="border-t border-white/25 mt-10 sm:mt-14 pt-6 sm:pt-7 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-white/70 text-xs">
             © 2026 NAGAS Resort &amp; Spa. All rights reserved.
           </p>
-          <div className="flex gap-6">
+          <div className="flex gap-4 sm:gap-6 flex-wrap justify-center">
             {['Privacy Policy', 'Terms of Service', 'Cookie Policy'].map((item) => (
               <a key={item} href="#" className="text-white/70 hover:text-white text-xs transition-colors">
                 {item}
