@@ -183,7 +183,7 @@ export default function Footer() {
             ))}
           </div>
           <p className="text-white/70 text-xs">
-            Developed by <span className="text-white font-semibold">SRIT</span>
+            Developed by <span className="text-white font-bold">SRIT</span>
           </p>
           <div className="flex items-center gap-2">
             <div className="w-1.5 h-1.5 bg-white rounded-full" />
