@@ -1,0 +1,5 @@
+# PAYPAL_ENV's value ("sandbox") and SMTP_HOST's value ("smtp.gmail.com") are
+# generic strings that legitimately appear inside Next.js and nodemailer
+# bundles, so the secrets scanner flags them as false positives.
+[build.environment]
+  SECRETS_SCAN_OMIT_KEYS = "PAYPAL_ENV,SMTP_HOST"

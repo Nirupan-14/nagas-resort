@@ -136,7 +136,7 @@ function buildHtmlEmail(data: ContactEmailData): string {
 export async function sendContactEmail(data: ContactEmailData) {
   const info = await transporter.sendMail({
     from: `"NAGAS Resort Website" <${process.env.SMTP_USER}>`,
-    to: 'mosesnirupan@gmail.com',
+    to: process.env.CONTACT_TO_EMAIL || process.env.SMTP_USER,
     replyTo: data.email,
     subject: `[NAGAS Resort] ${buildSubjectLabel(data.subject)} — ${data.name}`,
     html: buildHtmlEmail(data),
