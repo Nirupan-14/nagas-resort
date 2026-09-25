@@ -16,7 +16,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "NAGAS Resort — Luxury Escape in Paradise",
-  description: "Experience unparalleled luxury at NAGAS Resort. Discover breathtaking sunsets, lush tropical gardens, world-class dining, and bespoke hospitality in paradise.",
+  description: "Experience unparalleled luxury at NAGAS Resort. Discover breathtaking sunsets, lush tropical gardens, and bespoke hospitality in paradise.",
   keywords: "NAGAS resort, luxury resort, tropical paradise, sunset resort, luxury villa, tropical escape",
   openGraph: {
     title: "NAGAS Resort — Luxury Escape in Paradise",

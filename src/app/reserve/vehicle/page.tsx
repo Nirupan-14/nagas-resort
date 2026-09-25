@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { CalendarX2, Loader2, Lock } from 'lucide-react';
+import AvailabilityCalendar from '@/components/AvailabilityCalendar';
 
-const vehicles = [
+const DEFAULT_VEHICLES = [
   { name: 'Luxury Sedan', description: 'Perfect for airport transfers and intimate journeys.', image: '/images/hero.png', price: 60 },
   { name: 'Premium SUV', description: 'Spacious comfort for families and small groups.', image: '/images/pool.png', price: 95 },
   { name: 'Executive Minivan', description: 'Business travel with room for luggage and extra passengers.', image: '/images/room-suite.png', price: 140 },
@@ -16,10 +18,39 @@ const currency = (value: number) =>
     ? 'Custom quote'
     : value.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 
+const pad = (n: number) => String(n).padStart(2, '0');
+
+const dateKey = (d: Date) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+interface VehicleOption {
+  name: string;
+  description: string;
+  image: string;
+  price: number;
+}
+
+interface PayPalButtonsInstance {
+  render: (container: HTMLDivElement) => Promise<void>;
+}
+
+interface PayPalGlobal {
+  paypal?: {
+    Buttons: (config: {
+      style?: Record<string, string | number | boolean>;
+      createOrder?: () => Promise<string> | string;
+      onApprove?: (data: { orderID: string }) => void | Promise<void>;
+      onCancel?: () => void;
+      onError?: () => void;
+    }) => PayPalButtonsInstance;
+  };
+}
+
 export default function VehicleReservationPage() {
+  const [vehicles, setVehicles] = useState<VehicleOption[]>(DEFAULT_VEHICLES);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
+    phone: '',
     vehicleType: '',
     pickupDate: '',
     pickupTime: '',
@@ -27,25 +58,215 @@ export default function VehicleReservationPage() {
     passengers: '2',
     requests: '',
   });
-  const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [bookingRef, setBookingRef] = useState('');
+  const [bookedDates, setBookedDates] = useState<string[]>([]);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const [paypalReady, setPaypalReady] = useState(false);
+  const [dateConflict, setDateConflict] = useState(false);
+
+  const paypalContainerRef = useRef<HTMLDivElement>(null);
+  const payloadRef = useRef<Record<string, unknown>>({});
+  const bookedSetRef = useRef<Set<string>>(new Set());
+
+  const buildPayload = useCallback(() => {
+    return {
+      kind: 'vehicle',
+      vehicleType: formData.vehicleType,
+      pickupDate: formData.pickupDate,
+      pickupTime: formData.pickupTime,
+      destination: formData.destination,
+      passengers: Number(formData.passengers),
+      guest: { name: formData.name.trim(), email: formData.email.trim(), phone: formData.phone.trim() },
+      specialRequests: formData.requests.trim(),
+    };
+  }, [formData]);
+
+  useEffect(() => {
+    payloadRef.current = buildPayload();
+  });
+
+  useEffect(() => {
+    bookedSetRef.current = new Set(bookedDates);
+    if (formData.pickupDate && bookedDates.includes(formData.pickupDate)) {
+      setDateConflict(true);
+    } else {
+      setDateConflict(false);
+    }
+  }, [bookedDates, formData.pickupDate]);
 
   const selectedVehicle = vehicles.find((item) => item.name === formData.vehicleType);
   const selectedPrice = selectedVehicle?.price ?? 0;
   const totalEstimate = selectedPrice > 0 ? selectedPrice * Number(formData.passengers) : 0;
+  const payWithPaypal = paypalReady && selectedPrice > 0 && !dateConflict;
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/vehicles', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data: Array<{ name?: string; description?: string; imageUrl?: string; image?: string; price?: number | string }>) => {
+        if (cancelled) return;
+        if (Array.isArray(data) && data.length > 0) {
+          setVehicles(
+            data.map((v) => ({
+              name: v.name ?? 'Untitled Vehicle',
+              description: v.description ?? '',
+              image: v.imageUrl ?? v.image ?? '/images/hero.png',
+              price: Number(v.price) || 0,
+            }))
+          );
+        }
+      })
+      .catch(() => {
+        // keep defaults if the fleet API is unreachable
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!formData.vehicleType) {
+      setBookedDates([]);
+      return;
+    }
+    let cancelled = false;
+    setAvailabilityLoading(true);
+
+    const from = dateKey(new Date());
+    fetch(
+      `/api/bookings/vehicle-availability?vehicleType=${encodeURIComponent(
+        formData.vehicleType
+      )}&from=${from}`
+    )
+      .then((res) => res.json())
+      .then((data: { bookedDates?: string[] }) => {
+        if (cancelled) return;
+        setBookedDates(Array.isArray(data?.bookedDates) ? data.bookedDates : []);
+        if (formData.pickupDate && (data?.bookedDates || []).includes(formData.pickupDate)) {
+          setFormData((prev) => ({ ...prev, pickupDate: '' }));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setBookedDates([]);
+      })
+      .finally(() => {
+        if (!cancelled) setAvailabilityLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [formData.vehicleType]);
+
+  useEffect(() => {
+    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+    if (!clientId) return;
+    const src = `https://www.paypal.com/sdk/js?client-id=${clientId}&currency=USD&intent=capture`;
+    if (document.querySelector(`script[src="${src}"]`)) {
+      setPaypalReady(true);
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = src;
+    script.async = true;
+    script.onload = () => setPaypalReady(true);
+    document.body.appendChild(script);
+  }, []);
+
+  useEffect(() => {
+    if (!paypalReady || !formData.vehicleType || selectedPrice <= 0) return;
+    const container = paypalContainerRef.current;
+    if (!container) return;
+    const win = window as unknown as PayPalGlobal;
+    if (!win.paypal?.Buttons) return;
+
+    container.innerHTML = '';
+    win.paypal
+      .Buttons({
+        style: {
+          layout: 'horizontal',
+          color: 'gold',
+          shape: 'pill',
+          label: 'paypal',
+          height: 46,
+          tagline: false,
+        },
+        createOrder: async () => {
+          const payload = payloadRef.current;
+          if (bookedSetRef.current.has(String(payload.pickupDate))) {
+            throw new Error('This date is already booked. Please pick another date.');
+          }
+          const res = await fetch('/api/payments/paypal/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...payload }),
+          });
+          const json = await res.json();
+          if (!res.ok || !json.orderId) throw new Error(json?.error || 'Unable to start checkout.');
+          return json.orderId;
+        },
+        onApprove: async (data: { orderID: string }) => {
+          setSubmitting(true);
+          setSubmitError('');
+          try {
+            const res = await fetch('/api/payments/paypal/capture', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ orderId: data.orderID, booking: payloadRef.current }),
+            });
+            const json = await res.json();
+            if (!res.ok || !json.booking) throw new Error(json?.error || 'Payment could not be confirmed.');
+            setBookingRef(json.booking.bookingRef);
+            setFormData((prev) => ({ ...prev, pickupDate: '', pickupTime: '', vehicleType: '' }));
+          } catch (err) {
+            setSubmitError(err instanceof Error ? err.message : 'Payment could not be confirmed.');
+          } finally {
+            setSubmitting(false);
+          }
+        },
+        onCancel: () => {
+          setSubmitError('Payment was cancelled. You have not been charged.');
+        },
+        onError: () => {
+          setSubmitError('PayPal checkout failed. Please try again.');
+        },
+      })
+      .render(container);
+
+    return () => {
+      if (container) container.innerHTML = '';
+    };
+  }, [paypalReady, formData.vehicleType, selectedPrice]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleDirectRequest = async () => {
+    if (dateConflict) {
+      setSubmitError('This date is already booked. Please choose an available date from the calendar.');
+      return;
+    }
     setSubmitting(true);
-    setTimeout(() => {
+    setSubmitError('');
+    try {
+      const res = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payloadRef.current),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.error || 'Booking failed. Please try again.');
+      setBookingRef(json.booking.bookingRef);
+      setFormData((prev) => ({ ...prev, pickupDate: '', pickupTime: '' }));
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Something went wrong. Please try again.');
+    } finally {
       setSubmitting(false);
-      setSubmitted(true);
-    }, 1500);
+    }
   };
 
   return (
@@ -107,7 +328,7 @@ export default function VehicleReservationPage() {
               </span>
             </div>
 
-            <form className="space-y-5" onSubmit={handleSubmit}>
+            <div className="space-y-5">
               <div className="grid gap-5 sm:grid-cols-2">
                 <label className="block text-sm text-sunset-purple/80">
                   <span className="mb-2 block font-semibold">Full name</span>
@@ -136,6 +357,18 @@ export default function VehicleReservationPage() {
               </div>
 
               <div className="grid gap-5 sm:grid-cols-2">
+                <label className="block text-sm text-sunset-purple/80">
+                  <span className="mb-2 block font-semibold">Phone</span>
+                  <input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    required
+                    className="form-input"
+                    placeholder="+1 555 000 1234"
+                  />
+                </label>
                 <label className="block text-sm text-sunset-purple/80">
                   <span className="mb-2 block font-semibold">Vehicle type</span>
                   <select
@@ -168,18 +401,52 @@ export default function VehicleReservationPage() {
                 </label>
               </div>
 
-              <div className="grid gap-5 sm:grid-cols-2">
-                <label className="block text-sm text-sunset-purple/80">
-                  <span className="mb-2 block font-semibold">Pickup date</span>
-                  <input
-                    type="date"
-                    name="pickupDate"
+              <label className="block text-sm text-sunset-purple/80">
+                <span className="mb-2 block font-semibold">
+                  Pickup date
+                  {availabilityLoading ? (
+                    <Loader2 className="ml-2 inline h-3.5 w-3.5 animate-spin text-sunset-orange" />
+                  ) : null}
+                </span>
+                <input
+                  type="date"
+                  name="pickupDate"
+                  value={formData.pickupDate}
+                  onChange={handleChange}
+                  required
+                  className="form-input"
+                  min={dateKey(new Date())}
+                />
+              </label>
+
+              {formData.vehicleType ? (
+                <div>
+                  <p className="mb-2 text-xs uppercase tracking-[0.22em] text-sunset-purple/60">
+                    Availability for {formData.vehicleType}
+                  </p>
+                  <AvailabilityCalendar
+                    bookedDates={bookedDates}
                     value={formData.pickupDate}
-                    onChange={handleChange}
-                    required
-                    className="form-input"
+                    onSelect={(date) => setFormData((prev) => ({ ...prev, pickupDate: date }))}
                   />
-                </label>
+                </div>
+              ) : (
+                <div className="rounded-[1.25rem] border border-sunset-gold/15 bg-sunset-cream/70 p-4 text-sm text-sunset-purple/60">
+                  Select a vehicle above to see which dates are available.
+                </div>
+              )}
+
+              {dateConflict ? (
+                <div className="flex items-start gap-2.5 rounded-[1.25rem] border border-rose-500/25 bg-rose-500/10 p-4 text-sm text-rose-600">
+                  <CalendarX2 className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>
+                    This vehicle is already booked on <strong>{formData.pickupDate}</strong>.
+                    Please choose an available date from the calendar.
+                  </span>
+                </div>
+              ) : null}
+
+              <div className="grid gap-5 sm:grid-cols-2">
                 <label className="block text-sm text-sunset-purple/80">
                   <span className="mb-2 block font-semibold">Pickup time</span>
                   <input
@@ -191,20 +458,19 @@ export default function VehicleReservationPage() {
                     className="form-input"
                   />
                 </label>
+                <label className="block text-sm text-sunset-purple/80">
+                  <span className="mb-2 block font-semibold">Destination</span>
+                  <input
+                    type="text"
+                    name="destination"
+                    value={formData.destination}
+                    onChange={handleChange}
+                    required
+                    className="form-input"
+                    placeholder="Resort, airport, private villa..."
+                  />
+                </label>
               </div>
-
-              <label className="block text-sm text-sunset-purple/80">
-                <span className="mb-2 block font-semibold">Destination</span>
-                <input
-                  type="text"
-                  name="destination"
-                  value={formData.destination}
-                  onChange={handleChange}
-                  required
-                  className="form-input"
-                  placeholder="Resort, airport, private villa..."
-                />
-              </label>
 
               <label className="block text-sm text-sunset-purple/80">
                 <span className="mb-2 block font-semibold">Special requests</span>
@@ -212,7 +478,7 @@ export default function VehicleReservationPage() {
                   name="requests"
                   value={formData.requests}
                   onChange={handleChange}
-                  rows={4}
+                  rows={3}
                   className="form-input resize-none"
                   placeholder="Child seat, quiet ride, surprise arrangements..."
                 />
@@ -226,31 +492,61 @@ export default function VehicleReservationPage() {
                 </p>
               </div>
 
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full rounded-full px-6 py-3.5 sm:py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-sunset-orange inline-flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-                style={{ background: '#1B2A4A' }}
-              >
-                {submitting ? (
-                  <>
-                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                    </svg>
-                    <span className="truncate">Confirming…</span>
-                  </>
-                ) : (
-                  <span className="truncate">Confirm transfer request</span>
-                )}
-              </button>
-
-              {submitted && (
-                <div className="rounded-[1.4rem] border border-emerald-500/20 bg-emerald-500/10 p-4 text-sm text-emerald-700">
-                  Your transfer reservation request has been received. We will confirm your vehicle shortly.
+              {bookingRef ? (
+                <div className="flex items-start gap-2.5 rounded-[1.4rem] border border-emerald-500/25 bg-emerald-500/10 p-4 text-sm text-emerald-700">
+                  <Lock className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>
+                    Your vehicle reservation is confirmed! Booking reference: <strong>{bookingRef}</strong>. A confirmation will be sent to your email.
+                  </span>
                 </div>
-              )}
-            </form>
+              ) : submitError ? (
+                <div className="rounded-[1.4rem] border border-rose-500/25 bg-rose-500/10 p-4 text-sm text-rose-600">{submitError}</div>
+              ) : null}
+
+              {payWithPaypal ? (
+                <div>
+                  <div
+                    ref={paypalContainerRef}
+                    className="min-h-[46px]"
+                    aria-label="PayPal checkout"
+                  />
+                  <p className="mt-2 flex items-center justify-center gap-1.5 text-center text-xs text-sunset-purple/60">
+                    <Lock className="h-3 w-3" /> Secure payment via PayPal · You will be redirected to complete payment.
+                  </p>
+                </div>
+              ) : formData.vehicleType && selectedPrice === 0 ? (
+                <button
+                  type="button"
+                  onClick={handleDirectRequest}
+                  disabled={submitting || !formData.pickupDate || dateConflict}
+                  className="w-full rounded-full px-6 py-3.5 sm:py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-sunset-orange inline-flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                  style={{ background: '#1B2A4A' }}
+                >
+                  {submitting ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    'Request custom quote'
+                  )}
+                </button>
+              ) : formData.vehicleType ? (
+                <button
+                  type="button"
+                  onClick={handleDirectRequest}
+                  disabled={submitting || !formData.pickupDate || dateConflict}
+                  className="w-full rounded-full px-6 py-3.5 sm:py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-sunset-orange inline-flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+                  style={{ background: '#1B2A4A' }}
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span className="truncate">Booking…</span>
+                    </>
+                  ) : (
+                    <span className="truncate">Request booking (pay at pickup)</span>
+                  )}
+                </button>
+              ) : null}
+            </div>
           </section>
         </div>
       </div>

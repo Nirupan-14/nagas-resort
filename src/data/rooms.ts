@@ -37,7 +37,7 @@ export const roomOptions: RoomOption[] = [
     label: 'Royal Residence Suite',
     availability: '2 rooms available',
     note: 'Top-tier luxury experience with suite perks',
-    description: 'A refined residence that pairs open-air dining with elegant sustainable finishes.',
+    description: 'A refined residence that pairs open-air living with elegant sustainable finishes.',
     image: '/images/dining.png',
   },
 ];

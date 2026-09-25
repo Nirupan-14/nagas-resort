@@ -43,3 +43,21 @@ export async function getReviewsCollection() {
   const db = mongoClient.db('nagas-resort');
   return db.collection('reviews');
 }
+
+export async function getVehiclesCollection() {
+  const mongoClient = await getMongoClient();
+  const db = mongoClient.db('nagas-resort');
+  return db.collection('vehicles');
+}
+
+export async function getRoomsCollection() {
+  const mongoClient = await getMongoClient();
+  const db = mongoClient.db('nagas-resort');
+  return db.collection('rooms');
+}
+
+export async function getBookingsCollection() {
+  const mongoClient = await getMongoClient();
+  const db = mongoClient.db('nagas-resort');
+  return db.collection('bookings');
+}

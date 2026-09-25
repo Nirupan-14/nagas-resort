@@ -1,15 +1,47 @@
 'use client';
 
-import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getRoomOption } from '@/data/rooms';
+import { getRoomOption, type RoomOption } from '@/data/rooms';
 
 export default function ReservePage() {
   const params = useParams<{ room?: string }>();
   const roomSlug = Array.isArray(params?.room) ? params.room[0] : params?.room;
-  const selectedRoom = getRoomOption(roomSlug ?? '');
+  const fallbackRoom = getRoomOption(roomSlug ?? '');
+  const [selectedRoom, setSelectedRoom] = useState<RoomOption>(fallbackRoom);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/rooms', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data: any[]) => {
+        if (cancelled) return;
+        if (Array.isArray(data) && data.length > 0) {
+          const match = data.find((r) => r.slug === roomSlug);
+          if (match) {
+            const price = Number(match.price) || 0;
+            setSelectedRoom({
+              value: match.slug,
+              label: match.type ?? 'Luxury Room',
+              availability: match.roomNo ? `Room No. ${match.roomNo}` : 'Available',
+              note: price > 0 ? `From $${price.toLocaleString('en-US')}/night` : 'Custom quote — request price',
+              description: match.description ?? '',
+              image: match.imageUrls?.[0] ?? '/images/room-villa.png',
+            });
+          } else {
+            setSelectedRoom(fallbackRoom);
+          }
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setSelectedRoom(fallbackRoom);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [roomSlug, fallbackRoom]);
 
   const [formData, setFormData] = useState({
     name: '',

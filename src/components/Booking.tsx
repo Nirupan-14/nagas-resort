@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import type { RoomBookingForm, FoodBookingForm, VehicleBookingForm, BookingTab } from '@/types';
+import type { RoomBookingForm, VehicleBookingForm, BookingTab } from '@/types';
 
 const initialRoomForm: RoomBookingForm = {
   checkIn: '',
@@ -13,35 +13,29 @@ const initialRoomForm: RoomBookingForm = {
   specialRequests: '',
 };
 
-const initialFoodForm: FoodBookingForm = {
-  date: '',
-  time: '',
-  package: '',
-  people: 2,
-  dietaryNotes: '',
-};
-
 const initialVehicleForm: VehicleBookingForm = {
   vehicleType: '',
   pickupDate: '',
   pickupTime: '',
   destination: '',
   passengers: 1,
+  guestName: '',
+  guestEmail: '',
+  guestPhone: '',
 };
 
 const tabs: { id: BookingTab; label: string; icon: string }[] = [
   { id: 'room', label: 'Room Booking', icon: '🏨' },
-  { id: 'food', label: 'Dining Reservation', icon: '🍽️' },
   { id: 'vehicle', label: 'Vehicle & Transfer', icon: '🚗' },
 ];
 
 const experienceCards = [
   {
-    href: '/reserve/dining',
-    image: '/images/dining.png',
-    title: 'Dining reservation',
-    eyebrow: 'Signature dining',
-    description: 'Reserve a refined culinary experience with tasting menus, sunset dinners, and private table settings.',
+    href: '/reserve/room',
+    image: '/images/room-villa.png',
+    title: 'Room reservation',
+    eyebrow: 'Signature stays',
+    description: 'Browse the full room collection, pick your dates, and reserve your stay with transparent nightly pricing.',
     badge: 'New page',
   },
   {
@@ -60,14 +54,6 @@ const ROOM_PRICES: Record<string, { label: string; price: number }> = {
   'sunset-villa': { label: 'Sunset Pool Villa', price: 780 },
   'ocean-bungalow': { label: 'Ocean Bungalow', price: 520 },
   'royal-penthouse': { label: 'Royal Penthouse', price: 1200 },
-};
-
-const FOOD_PACKAGES: Record<string, { label: string; price: number }> = {
-  'sunset-dinner': { label: 'Sunset Dinner', price: 85 },
-  'beach-breakfast': { label: 'Beach Breakfast', price: 45 },
-  'chefs-table': { label: "Chef's Table Experience", price: 150 },
-  'poolside-brunch': { label: 'Poolside Brunch', price: 65 },
-  'traditional-feast': { label: 'Traditional Feast Night', price: 95 },
 };
 
 const VEHICLE_PRICES: Record<string, { label: string; price: number | null }> = {
@@ -94,7 +80,6 @@ type FieldErrors = Record<string, string>;
 export default function Booking() {
   const [activeTab, setActiveTab] = useState<BookingTab>('room');
   const [roomForm, setRoomForm] = useState<RoomBookingForm>(initialRoomForm);
-  const [foodForm, setFoodForm] = useState<FoodBookingForm>(initialFoodForm);
   const [vehicleForm, setVehicleForm] = useState<VehicleBookingForm>(initialVehicleForm);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
@@ -102,12 +87,6 @@ export default function Booking() {
   const handleRoomChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setRoomForm(prev => ({ ...prev, [name]: name === 'guests' ? Number(value) : value }));
-    setErrors(prev => ({ ...prev, [name]: '' }));
-  };
-
-  const handleFoodChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFoodForm(prev => ({ ...prev, [name]: name === 'people' ? Number(value) : value }));
     setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
@@ -124,11 +103,6 @@ export default function Booking() {
     return rate * (nights || 0);
   }, [roomForm.roomType, nights]);
 
-  const foodTotal = useMemo(() => {
-    const rate = FOOD_PACKAGES[foodForm.package]?.price ?? 0;
-    return rate * (foodForm.people || 0);
-  }, [foodForm.package, foodForm.people]);
-
   const vehicleRate = VEHICLE_PRICES[vehicleForm.vehicleType]?.price ?? null;
 
   const summary = useMemo(() => {
@@ -143,17 +117,6 @@ export default function Booking() {
         note: roomForm.roomType && nights > 0 ? `${currency(ROOM_PRICES[roomForm.roomType].price)} × ${nights} night${nights > 1 ? 's' : ''}` : null,
       };
     }
-    if (activeTab === 'food') {
-      return {
-        title: foodForm.package ? FOOD_PACKAGES[foodForm.package]?.label : 'Choose a package',
-        lines: [
-          foodForm.date && foodForm.time ? `${foodForm.date} at ${foodForm.time}` : 'Select date & time',
-          `${foodForm.people} guest${foodForm.people > 1 ? 's' : ''}`,
-        ],
-        total: foodTotal > 0 ? currency(foodTotal) : '—',
-        note: foodForm.package ? `${currency(FOOD_PACKAGES[foodForm.package].price)} × ${foodForm.people}` : null,
-      };
-    }
     return {
       title: vehicleForm.vehicleType ? VEHICLE_PRICES[vehicleForm.vehicleType]?.label : 'Choose a vehicle',
       lines: [
@@ -163,7 +126,7 @@ export default function Booking() {
       total: vehicleRate !== null ? currency(vehicleRate) : vehicleForm.vehicleType ? 'Custom quote' : '—',
       note: null,
     };
-  }, [activeTab, roomForm, foodForm, vehicleForm, nights, roomTotal, foodTotal, vehicleRate]);
+  }, [activeTab, roomForm, vehicleForm, nights, roomTotal, vehicleRate]);
 
   const validate = (): FieldErrors => {
     const next: FieldErrors = {};
@@ -172,20 +135,19 @@ export default function Booking() {
       if (!roomForm.checkOut) next.checkOut = 'Required';
       if (roomForm.checkIn && roomForm.checkOut && nights <= 0) next.checkOut = 'Must be after check-in';
       if (!roomForm.roomType) next.roomType = 'Please select a room';
-    } else if (activeTab === 'food') {
-      if (!foodForm.date) next.date = 'Required';
-      if (!foodForm.time) next.time = 'Required';
-      if (!foodForm.package) next.package = 'Please select a package';
     } else {
       if (!vehicleForm.vehicleType) next.vehicleType = 'Please select a vehicle';
       if (!vehicleForm.pickupDate) next.pickupDate = 'Required';
       if (!vehicleForm.pickupTime) next.pickupTime = 'Required';
       if (!vehicleForm.destination.trim()) next.destination = 'Required';
+      if (!vehicleForm.guestName.trim()) next.guestName = 'Required';
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(vehicleForm.guestEmail.trim())) next.guestEmail = 'Valid email required';
+      if (vehicleForm.guestPhone.trim().length < 5) next.guestPhone = 'Valid phone required';
     }
     return next;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const fieldErrors = validate();
     if (Object.keys(fieldErrors).length > 0) {
@@ -194,11 +156,32 @@ export default function Booking() {
     }
     setErrors({});
     setStatus('submitting');
-    // Simulated network round-trip — swap for a real API call.
-    setTimeout(() => {
+    try {
+      const payload =
+        activeTab === 'room'
+          ? { kind: 'room', roomType: roomForm.roomType, date: roomForm.checkIn, startTime: '08:00', guest: { name: 'Guest', email: '', phone: '' }, guests: roomForm.guests, specialRequests: roomForm.specialRequests }
+          : {
+              kind: 'vehicle',
+              vehicleType: vehicleForm.vehicleType,
+              pickupDate: vehicleForm.pickupDate,
+              pickupTime: vehicleForm.pickupTime,
+              destination: vehicleForm.destination,
+              passengers: vehicleForm.passengers,
+              guest: { name: vehicleForm.guestName.trim(), email: vehicleForm.guestEmail.trim(), phone: vehicleForm.guestPhone.trim() },
+            };
+      const res = await fetch('/api/bookings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json?.error || 'Request failed.');
       setStatus('success');
-      setTimeout(() => setStatus('idle'), 3500);
-    }, 900);
+      setTimeout(() => setStatus('idle'), 4000);
+    } catch {
+      setErrors({ submit: 'Submission failed. Please try again.' });
+      setStatus('idle');
+    }
   };
 
   const switchTab = (tab: BookingTab) => {
@@ -230,7 +213,7 @@ export default function Booking() {
             Book Your <span style={{ color: '#FFC15E' }}>Experience</span>
           </h2>
           <p className="text-white/90 mt-3 sm:mt-4 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed px-2">
-            Plan your perfect escape — from accommodations to dining and private transfers, we handle every detail with refined care.
+            Plan your perfect escape — from accommodations to private transfers, we handle every detail with refined care.
           </p>
         </div>
 
@@ -378,93 +361,17 @@ export default function Booking() {
                       className="form-input resize-none h-28"
                     />
                   </div>
-                </div>
-              )}
-
-              {/* Food Booking Form */}
-              {activeTab === 'food' && (
-                <div key="food" className="space-y-5 animate-[fadeIn_0.25s_ease]">
-                  <h3 className="font-serif text-2xl font-bold text-sunset-dark mb-6">Dining Reservation</h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-sm font-semibold text-sunset-purple mb-2">Date</label>
-                      <input
-                        type="date"
-                        name="date"
-                        id="food-date"
-                        value={foodForm.date}
-                        onChange={handleFoodChange}
-                        className={`form-input ${errClass('date')}`}
-                      />
-                      {errors.date && <p className="text-xs text-red-500 mt-1">{errors.date}</p>}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-sunset-purple mb-2">Time</label>
-                      <input
-                        type="time"
-                        name="time"
-                        id="food-time"
-                        value={foodForm.time}
-                        onChange={handleFoodChange}
-                        className={`form-input ${errClass('time')}`}
-                      />
-                      {errors.time && <p className="text-xs text-red-500 mt-1">{errors.time}</p>}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                    <div>
-                      <label className="block text-sm font-semibold text-sunset-purple mb-2">Dining Package</label>
-                      <select
-                        name="package"
-                        id="food-package"
-                        value={foodForm.package}
-                        onChange={handleFoodChange}
-                        className={`form-input ${errClass('package')}`}
-                      >
-                        <option value="">Select package...</option>
-                        {Object.entries(FOOD_PACKAGES).map(([value, { label, price }]) => (
-                          <option key={value} value={value}>{label} — {currency(price)}/person</option>
-                        ))}
-                      </select>
-                      {errors.package && <p className="text-xs text-red-500 mt-1">{errors.package}</p>}
-                    </div>
-                    <div>
-                      <label className="block text-sm font-semibold text-sunset-purple mb-2">Number of People</label>
-                      <select
-                        name="people"
-                        id="food-people"
-                        value={foodForm.people}
-                        onChange={handleFoodChange}
-                        className="form-input"
-                      >
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 10, 12].map(n => (
-                          <option key={n} value={n}>{n} {n === 1 ? 'Person' : 'People'}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold text-sunset-purple mb-2">Dietary Notes</label>
-                    <textarea
-                      name="dietaryNotes"
-                      id="food-dietary"
-                      value={foodForm.dietaryNotes}
-                      onChange={handleFoodChange}
-                      placeholder="Allergies, vegetarian, vegan preferences..."
-                      className="form-input resize-none h-28"
-                    />
-                  </div>
 
                   <div className="rounded-[1.4rem] border border-sunset-orange/20 bg-sunset-orange/10 p-4 text-sm text-sunset-dark">
-                    <p className="font-semibold">Prefer a dedicated dining experience?</p>
+                    <p className="font-semibold">Prefer a dedicated room experience?</p>
                     <p className="mt-2 text-sunset-purple/70">
-                      Visit our professional dining reservation page for a full table booking journey.
+                      Visit our full room reservation page to browse the room collection with photos and nightly pricing.
                     </p>
                     <Link
-                      href="/reserve/dining"
+                      href="/reserve/room"
                       className="mt-4 inline-flex rounded-full bg-sunset-dark px-4 py-2 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-sunset-orange"
                     >
-                      Go to dining reservation
+                      Go to room reservation
                     </Link>
                   </div>
                 </div>
@@ -520,17 +427,45 @@ export default function Booking() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
-                      <label className="block text-sm font-semibold text-sunset-purple mb-2">Destination</label>
+                      <label className="block text-sm font-semibold text-sunset-purple mb-2">Full name</label>
                       <input
                         type="text"
-                        name="destination"
-                        id="vehicle-destination"
-                        value={vehicleForm.destination}
+                        name="guestName"
+                        id="vehicle-guest-name"
+                        value={vehicleForm.guestName}
                         onChange={handleVehicleChange}
-                        placeholder="Airport, hotel, city..."
-                        className={`form-input ${errClass('destination')}`}
+                        className={`form-input ${errClass('guestName')}`}
+                        placeholder="Jordan Lee"
                       />
-                      {errors.destination && <p className="text-xs text-red-500 mt-1">{errors.destination}</p>}
+                      {errors.guestName && <p className="text-xs text-red-500 mt-1">{errors.guestName}</p>}
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-sunset-purple mb-2">Email address</label>
+                      <input
+                        type="email"
+                        name="guestEmail"
+                        id="vehicle-guest-email"
+                        value={vehicleForm.guestEmail}
+                        onChange={handleVehicleChange}
+                        className={`form-input ${errClass('guestEmail')}`}
+                        placeholder="you@example.com"
+                      />
+                      {errors.guestEmail && <p className="text-xs text-red-500 mt-1">{errors.guestEmail}</p>}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block text-sm font-semibold text-sunset-purple mb-2">Phone</label>
+                      <input
+                        type="tel"
+                        name="guestPhone"
+                        id="vehicle-guest-phone"
+                        value={vehicleForm.guestPhone}
+                        onChange={handleVehicleChange}
+                        className={`form-input ${errClass('guestPhone')}`}
+                        placeholder="+1 555 000 1234"
+                      />
+                      {errors.guestPhone && <p className="text-xs text-red-500 mt-1">{errors.guestPhone}</p>}
                     </div>
                     <div>
                       <label className="block text-sm font-semibold text-sunset-purple mb-2">Passengers</label>
@@ -546,6 +481,19 @@ export default function Booking() {
                         ))}
                       </select>
                     </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-sunset-purple mb-2">Destination</label>
+                    <input
+                      type="text"
+                      name="destination"
+                      id="vehicle-destination"
+                      value={vehicleForm.destination}
+                      onChange={handleVehicleChange}
+                      placeholder="Airport, hotel, city..."
+                      className={`form-input ${errClass('destination')}`}
+                    />
+                    {errors.destination && <p className="text-xs text-red-500 mt-1">{errors.destination}</p>}
                   </div>
                 </div>
               )}

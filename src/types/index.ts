@@ -44,23 +44,18 @@ export interface RoomBookingForm {
   specialRequests: string;
 }
 
-export interface FoodBookingForm {
-  date: string;
-  time: string;
-  package: string;
-  people: number;
-  dietaryNotes: string;
-}
-
 export interface VehicleBookingForm {
   vehicleType: string;
   pickupDate: string;
   pickupTime: string;
   destination: string;
   passengers: number;
+  guestName: string;
+  guestEmail: string;
+  guestPhone: string;
 }
 
-export type BookingTab = 'room' | 'food' | 'vehicle';
+export type BookingTab = 'room' | 'vehicle';
 
 // Contact
 export interface ContactForm {

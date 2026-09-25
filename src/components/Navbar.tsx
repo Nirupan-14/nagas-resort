@@ -9,6 +9,7 @@ const navItems: NavItem[] = [
   { label: 'Home', href: '#home' },
   { label: 'About', href: '#about' },
   { label: 'Rooms', href: '#rooms' },
+  { label: 'Vehicles', href: '/reserve/vehicle' },
   { label: 'Gallery', href: '#gallery' },
   { label: 'Garden', href: '#garden' },
   { label: 'Booking', href: '#booking' },
@@ -53,6 +54,13 @@ export default function Navbar() {
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
+
+    if (!href.startsWith('#')) {
+      router.push(href);
+      setMobileOpen(false);
+      return;
+    }
+
     const id = href.replace('#', '');
     const el = document.getElementById(id);
 

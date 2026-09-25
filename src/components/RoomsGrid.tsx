@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { roomOptions } from '@/data/rooms';
@@ -15,7 +15,7 @@ interface PropertyCard {
   roomSlug: string;
 }
 
-const properties: PropertyCard[] = [
+const DEFAULT_PROPERTIES: PropertyCard[] = [
   {
     id: 'room-01',
     title: 'Lagoon Villa Retreat',
@@ -46,7 +46,7 @@ const properties: PropertyCard[] = [
   {
     id: 'property-04',
     title: 'Royal Residence Suite',
-    description: 'A refined residence that pairs open-air dining with elegant sustainable finishes.',
+    description: 'A refined residence that pairs open-air living with elegant sustainable finishes.',
     image: '/images/dining.png',
     percentage: '510%',
     caption: 'Sustainability',
@@ -71,6 +71,9 @@ const properties: PropertyCard[] = [
     roomSlug: 'ocean-pavilion',
   },
 ];
+
+const formatPrice = (price: number) =>
+  price > 0 ? `$${price.toLocaleString('en-US')}/night` : 'Custom quote';
 
 function RoomCard({ property, onSelect }: { property: PropertyCard; onSelect: () => void }) {
   const [loading, setLoading] = useState(false);
@@ -155,7 +158,36 @@ function RoomCard({ property, onSelect }: { property: PropertyCard; onSelect: ()
 
 export default function RoomsGrid() {
   const router = useRouter();
+  const [properties, setProperties] = useState<PropertyCard[]>(DEFAULT_PROPERTIES);
   const [starting, setStarting] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/rooms', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data: any[]) => {
+        if (cancelled) return;
+        if (Array.isArray(data) && data.length > 0) {
+          setProperties(
+            data.map((r) => ({
+              id: r.id ?? String(Math.random()),
+              title: r.type ?? 'Luxury Room',
+              description: r.description ?? '',
+              image: r.imageUrls?.[0] ?? '/images/room-villa.png',
+              percentage: r.roomNo ? `Room ${r.roomNo}` : '',
+              caption: formatPrice(Number(r.price) || 0),
+              roomSlug: r.slug ?? 'lagoon-villa',
+            }))
+          );
+        }
+      })
+      .catch(() => {
+        // keep default properties if the rooms API is unavailable
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleSelectRoom = (property: PropertyCard) => {
     router.push(`/reserve/${property.roomSlug}`);

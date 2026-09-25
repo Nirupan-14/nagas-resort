@@ -10,13 +10,12 @@ const galleryImages: GalleryImage[] = [
   { id: '3', src: '/images/garden.png', alt: 'Tropical garden path', category: 'garden', span: 'tall' },
   { id: '4', src: '/images/room-suite.png', alt: 'Garden suite interior', category: 'rooms' },
   { id: '5', src: '/images/pool.png', alt: 'Infinity pool at sunset', category: 'pool', span: 'wide' },
-  { id: '6', src: '/images/dining.png', alt: 'Open-air dining', category: 'dining' },
   { id: '7', src: '/images/garden.png', alt: 'Garden blooms', category: 'garden' },
   { id: '8', src: '/images/room-villa.png', alt: 'Private pool villa', category: 'rooms' },
   { id: '9', src: '/images/pool.png', alt: 'Beachfront pool', category: 'pool' },
 ];
 
-const categories = ['All', 'Resort', 'Rooms', 'Garden', 'Pool', 'Dining'];
+const categories = ['All', 'Resort', 'Rooms', 'Garden', 'Pool'];
 
 export default function Gallery() {
   const [activeCategory, setActiveCategory] = useState('All');
